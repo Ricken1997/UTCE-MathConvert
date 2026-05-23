@@ -3,3 +3,7 @@ $\sum_{i=1}^{n} x^{i}$
 $\int_{0}^{1} x^{2} \, dx$
 $\sin(\theta) + \cos(\alpha)$
 $\log(x) + \beta^{2}$
+$\tan(\theta)$
+$\ln(x)$
+$e^{x}$
+$\pi \cdot  r^{2}$

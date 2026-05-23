@@ -3,3 +3,7 @@ sum(i,1,n,x^i)
 int(0,1,x^2,x)
 sin(theta) + cos(alpha)
 log(x) + beta^2
+tan(theta)
+ln(x)
+exp(x)
+pi * r^2

@@ -19,6 +19,10 @@ def plain_to_latex(expr):
     expr = re.sub(r"sin\((.*?)\)", r"\\sin(\1)", expr)
     expr = re.sub(r"cos\((.*?)\)", r"\\cos(\1)", expr)
     expr = re.sub(r"log\((.*?)\)", r"\\log(\1)", expr)
+    expr = re.sub(r"tan\((.*?)\)", r"\\tan(\1)", expr)
+    expr = re.sub(r"ln\((.*?)\)", r"\\ln(\1)", expr)
+    expr = re.sub(r"exp\((.*?)\)", r"e^{\1}", expr)
+    expr = re.sub(r"\bpi\b", r"\\pi", expr)
 
     greek = {
         "alpha": r"\alpha",
