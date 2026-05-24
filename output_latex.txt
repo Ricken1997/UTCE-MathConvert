@@ -7,3 +7,7 @@ $\tan(\theta)$
 $\ln(x)$
 $e^{x}$
 $\pi \cdot  r^{2}$
+$\lim_{x \to 0} \sin(x/x)$
+$\frac{\partial f}{\partial x}$
+$\left|x-1\right|$
+$\left\|v\right\|$

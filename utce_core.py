@@ -15,7 +15,21 @@ def plain_to_latex(expr):
         expr
     )
 
+    expr = re.sub(
+        r"lim\(([^,]+),([^,]+),([^)]+)\)",
+        r"\\lim_{\1 \\to \2} \3",
+        expr
+    )
+
+    expr = re.sub(
+        r"partial\(([^,]+),([^)]+)\)",
+        r"\\frac{\\partial \1}{\\partial \2}",
+        expr
+    )
+
     expr = re.sub(r"sqrt\((.*?)\)", r"\\sqrt{\1}", expr)
+    expr = re.sub(r"abs\((.*?)\)", r"\\left|\1\\right|", expr)
+    expr = re.sub(r"norm\((.*?)\)", r"\\left\\|\1\\right\\|", expr)
     expr = re.sub(r"sin\((.*?)\)", r"\\sin(\1)", expr)
     expr = re.sub(r"cos\((.*?)\)", r"\\cos(\1)", expr)
     expr = re.sub(r"log\((.*?)\)", r"\\log(\1)", expr)

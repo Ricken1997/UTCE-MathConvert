@@ -7,3 +7,7 @@ tan(theta)
 ln(x)
 exp(x)
 pi * r^2
+lim(x,0,sin(x)/x)
+partial(f,x)
+abs(x-1)
+norm(v)
