@@ -1,6 +1,7 @@
 import re
 
 def plain_to_latex(expr):
+    # Basic structured functions
     expr = re.sub(r"frac\((\d+),(\d+)\)", r"\\frac{\1}{\2}", expr)
 
     expr = re.sub(
@@ -27,17 +28,20 @@ def plain_to_latex(expr):
         expr
     )
 
+    # Wrappers
     expr = re.sub(r"sqrt\((.*?)\)", r"\\sqrt{\1}", expr)
     expr = re.sub(r"abs\((.*?)\)", r"\\left|\1\\right|", expr)
     expr = re.sub(r"norm\((.*?)\)", r"\\left\\|\1\\right\\|", expr)
+
+    # Functions
     expr = re.sub(r"sin\((.*?)\)", r"\\sin(\1)", expr)
     expr = re.sub(r"cos\((.*?)\)", r"\\cos(\1)", expr)
-    expr = re.sub(r"log\((.*?)\)", r"\\log(\1)", expr)
     expr = re.sub(r"tan\((.*?)\)", r"\\tan(\1)", expr)
+    expr = re.sub(r"log\((.*?)\)", r"\\log(\1)", expr)
     expr = re.sub(r"ln\((.*?)\)", r"\\ln(\1)", expr)
     expr = re.sub(r"exp\((.*?)\)", r"e^{\1}", expr)
-    expr = re.sub(r"\bpi\b", r"\\pi", expr)
 
+    # Greek letters
     greek = {
         "alpha": r"\alpha",
         "beta": r"\beta",
@@ -52,13 +56,21 @@ def plain_to_latex(expr):
     for plain, latex in greek.items():
         expr = re.sub(rf"\b{plain}\b", lambda m: latex, expr)
 
+    # Constants and operators
+    expr = re.sub(r"\bpi\b", r"\\pi", expr)
+    expr = expr.replace("<=", r"\le ")
+    expr = expr.replace(">=", r"\ge ")
+    expr = expr.replace("!=", r"\ne ")
+    expr = expr.replace("->", r"\to ")
+    expr = expr.replace("<->", r"\leftrightarrow ")
+    expr = expr.replace("*", r"\cdot ")
+
+    # Exponents
     expr = re.sub(
         r"([A-Za-z])\^([0-9A-Za-z])",
         r"\1^{\2}",
         expr
     )
-
-    expr = expr.replace("*", r"\cdot ")
 
     return "$" + expr + "$"
 

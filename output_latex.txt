@@ -11,3 +11,8 @@ $\lim_{x \to 0} \sin(x/x)$
 $\frac{\partial f}{\partial x}$
 $\left|x-1\right|$
 $\left\|v\right\|$
+$x \le  y$
+$a \ge  b$
+$x \ne  0$
+$A \to  B$
+$P <\to  Q$

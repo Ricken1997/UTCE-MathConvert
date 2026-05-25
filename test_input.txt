@@ -11,3 +11,8 @@ lim(x,0,sin(x)/x)
 partial(f,x)
 abs(x-1)
 norm(v)
+x <= y
+a >= b
+x != 0
+A -> B
+P <-> Q
