@@ -28,9 +28,38 @@ def plain_to_latex(expr):
         expr
     )
 
+    expr = re.sub(
+        r"cases\((.*?);(.*?)\)",
+        r"\\begin{cases} \1 \\\\ \2 \\end{cases}",
+        expr
+    )
+
+    expr = re.sub(
+        r"matrix\(([^,;]+),([^;]+);([^,;]+),([^)]+)\)",
+        r"\\begin{bmatrix} \1 & \2 \\\\ \3 & \4 \\end{bmatrix}",
+        expr
+    )
+
+    expr = re.sub(
+    r"dot\((.*?),(.*?)\)",
+    r"\1 \\cdot \2",
+    expr
+    )
+
+    expr = re.sub(
+    r"cross\((.*?),(.*?)\)",
+    r"\1 \\times \2",
+    expr
+    )
+
     # Wrappers
     expr = re.sub(r"sqrt\((.*?)\)", r"\\sqrt{\1}", expr)
     expr = re.sub(r"abs\((.*?)\)", r"\\left|\1\\right|", expr)
+    expr = re.sub(r"vec\((.*?)\)", r"\\vec{\1}", expr)
+    expr = re.sub(r"hat\((.*?)\)", r"\\hat{\1}", expr)
+    expr = re.sub(r"bar\((.*?)\)", r"\\bar{\1}", expr)
+    expr = re.sub(r"max\((.*?)\)", r"\\max(\1)", expr)
+    expr = re.sub(r"min\((.*?)\)", r"\\min(\1)", expr)
     expr = re.sub(r"norm\((.*?)\)", r"\\left\\|\1\\right\\|", expr)
 
     # Functions

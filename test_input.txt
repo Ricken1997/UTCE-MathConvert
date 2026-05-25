@@ -16,3 +16,12 @@ a >= b
 x != 0
 A -> B
 P <-> Q
+vec(v)
+hat(x)
+bar(y)
+max(a,b)
+min(x,y)
+cases(x>0,x^2; x<0,-x)
+matrix(a,b;c,d)
+dot(a,b)
+cross(u,v)

@@ -16,3 +16,12 @@ $a \ge  b$
 $x \ne  0$
 $A \to  B$
 $P <\to  Q$
+$\vec{v}$
+$\hat{x}$
+$\bar{y}$
+$\max(a,b)$
+$\min(x,y)$
+$\begin{cases} x>0,x^{2} \\  x<0,-x \end{cases}$
+$\begin{bmatrix} a & b \\ c & d \end{bmatrix}$
+$a \cdot b$
+$u \times v$
