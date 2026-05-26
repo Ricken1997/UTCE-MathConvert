@@ -25,3 +25,9 @@ cases(x>0,x^2; x<0,-x)
 matrix(a,b;c,d)
 dot(a,b)
 cross(u,v)
+det(A)
+floor(x/2)
+ceil(n/3)
+mu + phi
+x_1 + a_n
+y_(n+1)

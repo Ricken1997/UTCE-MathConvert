@@ -40,6 +40,10 @@ def plain_to_latex(expr):
         expr
     )
 
+    expr = re.sub(r"det\((.*?)\)", r"\\det(\1)", expr)
+    expr = re.sub(r"floor\((.*?)\)", r"\\lfloor \1 \\rfloor", expr)
+    expr = re.sub(r"ceil\((.*?)\)", r"\\lceil \1 \\rceil", expr)
+
     expr = re.sub(
     r"dot\((.*?),(.*?)\)",
     r"\1 \\cdot \2",
@@ -72,15 +76,20 @@ def plain_to_latex(expr):
 
     # Greek letters
     greek = {
-        "alpha": r"\alpha",
-        "beta": r"\beta",
-        "gamma": r"\gamma",
-        "delta": r"\delta",
-        "theta": r"\theta",
-        "lambda": r"\lambda",
-        "sigma": r"\sigma",
-        "omega": r"\omega",
-    }
+    "alpha": r"\alpha",
+    "beta": r"\beta",
+    "gamma": r"\gamma",
+    "delta": r"\delta",
+    "epsilon": r"\epsilon",
+    "theta": r"\theta",
+    "lambda": r"\lambda",
+    "mu": r"\mu",
+    "nu": r"\nu",
+    "rho": r"\rho",
+    "sigma": r"\sigma",
+    "phi": r"\phi",
+    "omega": r"\omega",
+}
 
     for plain, latex in greek.items():
         expr = re.sub(rf"\b{plain}\b", lambda m: latex, expr)
@@ -94,6 +103,19 @@ def plain_to_latex(expr):
     expr = expr.replace("<->", r"\leftrightarrow ")
     expr = expr.replace("*", r"\cdot ")
 
+    # Subscripts
+    expr = re.sub(
+    r"([A-Za-z])_([0-9A-Za-z])",
+    r"\1_{\2}",
+    expr
+    )
+
+    expr = re.sub(
+    r"([A-Za-z])_\(([^()]*)\)",
+    r"\1_{\2}",
+    expr
+    )
+    
     # Exponents
     expr = re.sub(
         r"([A-Za-z])\^([0-9A-Za-z])",
