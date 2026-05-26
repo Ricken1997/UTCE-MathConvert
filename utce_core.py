@@ -1,4 +1,5 @@
 import re
+import sys
 
 def plain_to_latex(expr):
     # Basic structured functions
@@ -41,8 +42,8 @@ def plain_to_latex(expr):
     )
 
     expr = re.sub(r"det\((.*?)\)", r"\\det(\1)", expr)
-    expr = re.sub(r"floor\((.*?)\)", r"\\lfloor \1 \\rfloor", expr)
-    expr = re.sub(r"ceil\((.*?)\)", r"\\lceil \1 \\rceil", expr)
+    expr = re.sub(r"floor\((.*?)\)", r"\\left\\lfloor \1 \\right\\rfloor", expr)
+    expr = re.sub(r"ceil\((.*?)\)", r"\\left\\lceil \1 \\right\\rceil", expr)
 
     expr = re.sub(
     r"dot\((.*?),(.*?)\)",
@@ -125,8 +126,16 @@ def plain_to_latex(expr):
 
     return "$" + expr + "$"
 
+input_file = "test_input.txt"
+output_file = "output_latex.txt"
 
-with open("test_input.txt", "r", encoding="utf-8") as f:
+if len(sys.argv) >= 2:
+    input_file = sys.argv[1]
+
+if len(sys.argv) >= 3:
+    output_file = sys.argv[2]
+
+with open(input_file, "r", encoding="utf-8") as f:
     lines = f.readlines()
 
 latex_lines = []
@@ -146,5 +155,8 @@ print()
 print("LaTeX:")
 print(latex)
 
-with open("output_latex.txt", "w", encoding="utf-8") as f:
+with open(output_file, "w", encoding="utf-8") as f:
     f.write(latex)
+
+print()
+print(f"Output saved to: {output_file}")

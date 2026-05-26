@@ -26,8 +26,8 @@ $\begin{bmatrix} a & b \\ c & d \end{bmatrix}$
 $a \cdot b$
 $u \times v$
 $\det(A)$
-$\lfloor x/2 \rfloor$
-$\lceil n/3 \rceil$
+$\left\lfloor x/2 \right\rfloor$
+$\left\lceil n/3 \right\rceil$
 $\mu + \phi$
 $x_{1} + a_{n}$
 $y_{n+1}$
