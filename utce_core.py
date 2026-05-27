@@ -145,6 +145,20 @@ for line in lines:
     if text:
         latex_lines.append(plain_to_latex(text))
 
+if "--help" in sys.argv or "-h" in sys.argv:
+    print("UTCE MathConvert v2.5 beta")
+    print()
+    print("Usage:")
+    print("  python3 utce_core.py input.txt output.txt --inline")
+    print("  python3 utce_core.py input.txt output.txt --block")
+    print("  python3 utce_core.py input.txt output.txt --raw")
+    print()
+    print("Modes:")
+    print("  --inline   Output as $...$")
+    print("  --block    Output as \\[...\\]")
+    print("  --raw      Output LaTeX without math delimiters")
+    sys.exit(0)
+
 mode = "--inline"
 
 if len(sys.argv) >= 4:
@@ -152,6 +166,8 @@ if len(sys.argv) >= 4:
 
 if mode == "--block":
     latex = "\n".join([r"\[" + line.strip("$") + r"\]" for line in latex_lines])
+elif mode == "--raw":
+    latex = "\n".join([line.strip("$") for line in latex_lines])
 else:
     latex = "\n".join(latex_lines)
 

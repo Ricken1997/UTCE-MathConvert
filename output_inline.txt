@@ -1,0 +1,33 @@
+$\frac{1}{2} + \sqrt{x^{2}}$
+$\sum_{i=1}^{n} x^{i}$
+$\int_{0}^{1} x^{2} \, dx$
+$\sin(\theta) + \cos(\alpha)$
+$\log(x) + \beta^{2}$
+$\tan(\theta)$
+$\ln(x)$
+$e^{x}$
+$\pi \cdot  r^{2}$
+$\lim_{x \to 0} \sin(x/x)$
+$\frac{\partial f}{\partial x}$
+$\left|x-1\right|$
+$\left\|v\right\|$
+$x \le  y$
+$a \ge  b$
+$x \ne  0$
+$A \to  B$
+$P <\to  Q$
+$\vec{v}$
+$\hat{x}$
+$\bar{y}$
+$\max(a,b)$
+$\min(x,y)$
+$\begin{cases} x>0,x^{2} \\  x<0,-x \end{cases}$
+$\begin{bmatrix} a & b \\ c & d \end{bmatrix}$
+$a \cdot b$
+$u \times v$
+$\det(A)$
+$\left\lfloor x/2 \right\rfloor$
+$\left\lceil n/3 \right\rceil$
+$\mu + \phi$
+$x_{1} + a_{n}$
+$y_{n+1}$
