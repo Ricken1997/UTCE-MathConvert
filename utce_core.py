@@ -145,7 +145,15 @@ for line in lines:
     if text:
         latex_lines.append(plain_to_latex(text))
 
-latex = "\n".join(latex_lines)
+mode = "--inline"
+
+if len(sys.argv) >= 4:
+    mode = sys.argv[3]
+
+if mode == "--block":
+    latex = "\n".join([r"\[" + line.strip("$") + r"\]" for line in latex_lines])
+else:
+    latex = "\n".join(latex_lines)
 
 print("Plain:")
 for line in lines:
