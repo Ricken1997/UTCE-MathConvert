@@ -2,6 +2,8 @@ import subprocess
 import re
 import sys
 
+VERSION = "3.0-beta"
+
 def plain_to_latex(expr):
     # Basic structured functions
     expr = re.sub(r"frac\((\d+),(\d+)\)", r"\\frac{\1}{\2}", expr)
@@ -146,8 +148,12 @@ for line in lines:
     if text:
         latex_lines.append(plain_to_latex(text))
 
+if "--version" in sys.argv or "-v" in sys.argv:
+    print(f"UTCE MathConvert {VERSION}")
+    sys.exit(0)
+
 if "--help" in sys.argv or "-h" in sys.argv:
-    print("UTCE MathConvert v2.5 beta")
+    print(f"UTCE MathConvert {VERSION}")
     print()
     print("Usage:")
     print("  python3 utce_core.py input.txt output.txt --inline")
