@@ -28,3 +28,12 @@ Edit `test_input.txt`, then run:
 
 ```bash
 python3 utce_core.py
+
+## Clipboard Copy
+
+Use `--copy` to copy the converted LaTeX directly to the macOS clipboard.
+
+```bash
+python3 utce_core.py test_input.txt output_latex.txt --inline --copy
+python3 utce_core.py test_input.txt output_block.txt --block --copy
+python3 utce_core.py test_input.txt output_raw.txt --raw --copy

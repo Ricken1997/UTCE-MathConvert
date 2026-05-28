@@ -1,3 +1,4 @@
+import subprocess
 import re
 import sys
 
@@ -159,6 +160,8 @@ if "--help" in sys.argv or "-h" in sys.argv:
     print("  --raw      Output LaTeX without math delimiters")
     sys.exit(0)
 
+copy_to_clipboard = "--copy" in sys.argv
+
 mode = "--inline"
 
 if len(sys.argv) >= 4:
@@ -184,3 +187,7 @@ with open(output_file, "w", encoding="utf-8") as f:
 
 print()
 print(f"Output saved to: {output_file}")
+
+if copy_to_clipboard:
+    subprocess.run("pbcopy", text=True, input=latex)
+    print("Output copied to clipboard.")
