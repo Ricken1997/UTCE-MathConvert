@@ -129,14 +129,31 @@ def plain_to_latex(expr):
 
     return "$" + expr + "$"
 
+if len(sys.argv) < 3 and "--help" not in sys.argv and "-h" not in sys.argv and "--version" not in sys.argv and "-v" not in sys.argv:
+    print()
+    print(f"UTCE MathConvert {VERSION}")
+    print()
+    print("Usage:")
+    print("  python3 utce_core.py input.txt output.txt --inline")
+    print("  python3 utce_core.py input.txt output.txt --block")
+    print("  python3 utce_core.py input.txt output.txt --raw")
+    print("  python3 utce_core.py input.txt output.txt --inline --copy")
+    print()
+    sys.exit(1)
+
 input_file = "test_input.txt"
 output_file = "output_latex.txt"
 
-if len(sys.argv) >= 2:
+if len(sys.argv) >= 2 and not sys.argv[1].startswith("-"):
     input_file = sys.argv[1]
 
-if len(sys.argv) >= 3:
+if len(sys.argv) >= 3 and not sys.argv[2].startswith("-"):
     output_file = sys.argv[2]
+
+if not os.path.exists(input_file):
+    print()
+    print(f"Input file not found: {input_file}")
+    sys.exit(1)
 
 with open(input_file, "r", encoding="utf-8") as f:
     lines = f.readlines()
