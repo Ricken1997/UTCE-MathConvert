@@ -37,3 +37,28 @@ Use `--copy` to copy the converted LaTeX directly to the macOS clipboard.
 python3 utce_core.py test_input.txt output_latex.txt --inline --copy
 python3 utce_core.py test_input.txt output_block.txt --block --copy
 python3 utce_core.py test_input.txt output_raw.txt --raw --copy
+
+## Validation Warnings
+
+UTCE MathConvert checks basic function argument counts and prints warnings when the input appears incomplete.
+
+Examples:
+
+```text
+frac(1)
+sum(1,2)
+int(0,1,x)
+lim(x,0)
+matrix(a,b,c)
+
+Warning: frac requires 2 arguments, got 1
+Warning: sum requires 4 arguments, got 2
+Warning: int requires 4 arguments, got 3
+Warning: lim requires 3 arguments, got 2
+Warning: matrix requires 4 arguments, got 3
+
+```bash
+git add .
+git commit -m "UTCE MathConvert v3.5 README validation documentation"
+git tag v3.5
+git status
