@@ -1,6 +1,7 @@
 import subprocess
 import re
 import sys
+import os
 
 VERSION = "3.0-beta"
 
