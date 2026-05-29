@@ -191,6 +191,14 @@ mode = "--inline"
 if len(sys.argv) >= 4:
     mode = sys.argv[3]
 
+    valid_modes = ["--inline", "--block", "--raw"]
+
+if mode not in valid_modes:
+    print()
+    print(f"Unknown mode: {mode}")
+    print("Use --inline, --block, or --raw")
+    sys.exit(1)   
+
 if mode == "--block":
     latex = "\n".join([r"\[" + line.strip("$") + r"\]" for line in latex_lines])
 elif mode == "--raw":
