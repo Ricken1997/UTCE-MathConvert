@@ -56,9 +56,3 @@ Warning: sum requires 4 arguments, got 2
 Warning: int requires 4 arguments, got 3
 Warning: lim requires 3 arguments, got 2
 Warning: matrix requires 4 arguments, got 3
-
-```bash
-git add .
-git commit -m "UTCE MathConvert v3.5 README validation documentation"
-git tag v3.5
-git status
