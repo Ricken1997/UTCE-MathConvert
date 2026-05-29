@@ -5,6 +5,33 @@ import os
 
 VERSION = "3.0-beta"
 
+def validate_plain_math(expr):
+    warnings = []
+
+    checks = {
+        "frac": 2,
+        "sum": 4,
+        "int": 4,
+        "lim": 3,
+        "partial": 2,
+        "matrix": 4,
+        "dot": 2,
+        "cross": 2,
+        "max": 2,
+        "min": 2,
+    }
+
+    for name, required_count in checks.items():
+        if expr.startswith(name + "(") and expr.endswith(")"):
+            inside = expr[len(name) + 1:-1]
+            parts = [p.strip() for p in inside.split(",")]
+            if len(parts) < required_count:
+                warnings.append(
+                    f"Warning: {name} requires {required_count} arguments, got {len(parts)}: {expr}"
+                )
+
+    return warnings
+
 def plain_to_latex(expr):
     # Basic structured functions
     expr = re.sub(r"frac\((\d+),(\d+)\)", r"\\frac{\1}{\2}", expr)
@@ -161,9 +188,12 @@ with open(input_file, "r", encoding="utf-8") as f:
 
 latex_lines = []
 
+warnings = []
+
 for line in lines:
     text = line.strip()
     if text:
+        warnings.extend(validate_plain_math(text))
         latex_lines.append(plain_to_latex(text))
 
 if "--version" in sys.argv or "-v" in sys.argv:
@@ -209,6 +239,12 @@ else:
 print("Plain:")
 for line in lines:
     print(line.strip())
+
+if warnings:
+    print()
+    print("Warnings:")
+    for warning in warnings:
+        print(warning)
 
 print()
 print("LaTeX:")
