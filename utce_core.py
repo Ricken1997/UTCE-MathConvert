@@ -193,10 +193,14 @@ latex_lines = []
 
 warnings = []
 
-for line in lines:
+for line_number, line in enumerate(lines, start=1):
     text = line.strip()
     if text:
-        warnings.extend(validate_plain_math(text))
+        line_warnings = validate_plain_math(text)
+
+        for warning in line_warnings:
+            warnings.append(f"Line {line_number}: {warning}")
+
         latex_lines.append(plain_to_latex(text))
 
 if "--version" in sys.argv or "-v" in sys.argv:
