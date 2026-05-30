@@ -317,11 +317,24 @@ input_line_count = len(lines)
 output_line_count = len(latex_lines)
 warning_count = len(warnings)
 
+warning_type_counts = {}
+
+for warning in warnings:
+    match = re.search(r"Warning: ([a-zA-Z_]+)", warning)
+    if match:
+        warning_type = match.group(1)
+        warning_type_counts[warning_type] = warning_type_counts.get(warning_type, 0) + 1
+
 html_lines.append("<h2>Summary</h2>")
 html_lines.append('<div class="summary">')
 html_lines.append(f"<div>Input Lines: {input_line_count}</div>")
 html_lines.append(f"<div>Output Lines: {output_line_count}</div>")
 html_lines.append(f"<div>Warnings: {warning_count}</div>")
+
+if warning_type_counts:
+    html_lines.append("<div><strong>Warning Types:</strong></div>")
+    for warning_type, count in warning_type_counts.items():
+        html_lines.append(f"<div>{html.escape(warning_type)}: {count}</div>")
 html_lines.append("</div>")
 
 html_lines.append("<h2>Warnings</h2>")
