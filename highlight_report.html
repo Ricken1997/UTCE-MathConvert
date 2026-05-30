@@ -10,55 +10,56 @@ h1 { font-size: 24px; }
 .warn { background: #fff3cd; padding: 6px; margin: 4px 0; border-left: 4px solid #ff9800; }
 .line { font-family: monospace; }
 .latex { color: #333; font-family: monospace; }
+.lineno { color: #777; display: inline-block; width: 48px; }
 </style>
 </head>
 <body>
 <h1>UTCE MathConvert Highlight Report</h1>
 <h2>Warnings</h2>
-<div class="warn">Warning: matrix requires 4 arguments, got 3: matrix(a,b;c,d)</div>
-<div class="warn">Warning: frac requires 2 arguments, got 1: frac(1)</div>
-<div class="warn">Warning: sum requires 4 arguments, got 2: sum(1,2)</div>
-<div class="warn">Warning: int requires 4 arguments, got 3: int(0,1,x)</div>
-<div class="warn">Warning: lim requires 3 arguments, got 2: lim(x,0)</div>
-<div class="warn">Warning: matrix requires 4 arguments, got 3: matrix(a,b,c)</div>
+<div class="warn"><span class="lineno">1</span>Warning: matrix requires 4 arguments, got 3: matrix(a,b;c,d)</div>
+<div class="warn"><span class="lineno">2</span>Warning: frac requires 2 arguments, got 1: frac(1)</div>
+<div class="warn"><span class="lineno">3</span>Warning: sum requires 4 arguments, got 2: sum(1,2)</div>
+<div class="warn"><span class="lineno">4</span>Warning: int requires 4 arguments, got 3: int(0,1,x)</div>
+<div class="warn"><span class="lineno">5</span>Warning: lim requires 3 arguments, got 2: lim(x,0)</div>
+<div class="warn"><span class="lineno">6</span>Warning: matrix requires 4 arguments, got 3: matrix(a,b,c)</div>
 <h2>LaTeX Output</h2>
-<div class="line latex">$\frac{1}{2} + \sqrt{x^{2}}$</div>
-<div class="line latex">$\sum_{i=1}^{n} x^{i}$</div>
-<div class="line latex">$\int_{0}^{1} x^{2} \, dx$</div>
-<div class="line latex">$\sin(\theta) + \cos(\alpha)$</div>
-<div class="line latex">$\log(x) + \beta^{2}$</div>
-<div class="line latex">$\tan(\theta)$</div>
-<div class="line latex">$\ln(x)$</div>
-<div class="line latex">$e^{x}$</div>
-<div class="line latex">$\pi \cdot  r^{2}$</div>
-<div class="line latex">$\lim_{x \to 0} \sin(x/x)$</div>
-<div class="line latex">$\frac{\partial f}{\partial x}$</div>
-<div class="line latex">$\left|x-1\right|$</div>
-<div class="line latex">$\left\|v\right\|$</div>
-<div class="line latex">$x \le  y$</div>
-<div class="line latex">$a \ge  b$</div>
-<div class="line latex">$x \ne  0$</div>
-<div class="line latex">$A \to  B$</div>
-<div class="line latex">$P &lt;\to  Q$</div>
-<div class="line latex">$\vec{v}$</div>
-<div class="line latex">$\hat{x}$</div>
-<div class="line latex">$\bar{y}$</div>
-<div class="line latex">$\max(a,b)$</div>
-<div class="line latex">$\min(x,y)$</div>
-<div class="line latex">$\begin{cases} x&gt;0,x^{2} \\  x&lt;0,-x \end{cases}$</div>
-<div class="line latex">$\begin{bmatrix} a &amp; b \\ c &amp; d \end{bmatrix}$</div>
-<div class="line latex">$a \cdot b$</div>
-<div class="line latex">$u \times v$</div>
-<div class="line latex">$\det(A)$</div>
-<div class="line latex">$\left\lfloor x/2 \right\rfloor$</div>
-<div class="line latex">$\left\lceil n/3 \right\rceil$</div>
-<div class="line latex">$\mu + \phi$</div>
-<div class="line latex">$x_{1} + a_{n}$</div>
-<div class="line latex">$y_{n+1}$</div>
-<div class="line latex">$frac(1)$</div>
-<div class="line latex">$sum(1,2)$</div>
-<div class="line latex">$int(0,1,x)$</div>
-<div class="line latex">$lim(x,0)$</div>
-<div class="line latex">$matrix(a,b,c)$</div>
+<div class="line latex"><span class="lineno">1</span>$\frac{1}{2} + \sqrt{x^{2}}$</div>
+<div class="line latex"><span class="lineno">2</span>$\sum_{i=1}^{n} x^{i}$</div>
+<div class="line latex"><span class="lineno">3</span>$\int_{0}^{1} x^{2} \, dx$</div>
+<div class="line latex"><span class="lineno">4</span>$\sin(\theta) + \cos(\alpha)$</div>
+<div class="line latex"><span class="lineno">5</span>$\log(x) + \beta^{2}$</div>
+<div class="line latex"><span class="lineno">6</span>$\tan(\theta)$</div>
+<div class="line latex"><span class="lineno">7</span>$\ln(x)$</div>
+<div class="line latex"><span class="lineno">8</span>$e^{x}$</div>
+<div class="line latex"><span class="lineno">9</span>$\pi \cdot  r^{2}$</div>
+<div class="line latex"><span class="lineno">10</span>$\lim_{x \to 0} \sin(x/x)$</div>
+<div class="line latex"><span class="lineno">11</span>$\frac{\partial f}{\partial x}$</div>
+<div class="line latex"><span class="lineno">12</span>$\left|x-1\right|$</div>
+<div class="line latex"><span class="lineno">13</span>$\left\|v\right\|$</div>
+<div class="line latex"><span class="lineno">14</span>$x \le  y$</div>
+<div class="line latex"><span class="lineno">15</span>$a \ge  b$</div>
+<div class="line latex"><span class="lineno">16</span>$x \ne  0$</div>
+<div class="line latex"><span class="lineno">17</span>$A \to  B$</div>
+<div class="line latex"><span class="lineno">18</span>$P &lt;\to  Q$</div>
+<div class="line latex"><span class="lineno">19</span>$\vec{v}$</div>
+<div class="line latex"><span class="lineno">20</span>$\hat{x}$</div>
+<div class="line latex"><span class="lineno">21</span>$\bar{y}$</div>
+<div class="line latex"><span class="lineno">22</span>$\max(a,b)$</div>
+<div class="line latex"><span class="lineno">23</span>$\min(x,y)$</div>
+<div class="line latex"><span class="lineno">24</span>$\begin{cases} x&gt;0,x^{2} \\  x&lt;0,-x \end{cases}$</div>
+<div class="line latex"><span class="lineno">25</span>$\begin{bmatrix} a &amp; b \\ c &amp; d \end{bmatrix}$</div>
+<div class="line latex"><span class="lineno">26</span>$a \cdot b$</div>
+<div class="line latex"><span class="lineno">27</span>$u \times v$</div>
+<div class="line latex"><span class="lineno">28</span>$\det(A)$</div>
+<div class="line latex"><span class="lineno">29</span>$\left\lfloor x/2 \right\rfloor$</div>
+<div class="line latex"><span class="lineno">30</span>$\left\lceil n/3 \right\rceil$</div>
+<div class="line latex"><span class="lineno">31</span>$\mu + \phi$</div>
+<div class="line latex"><span class="lineno">32</span>$x_{1} + a_{n}$</div>
+<div class="line latex"><span class="lineno">33</span>$y_{n+1}$</div>
+<div class="line latex"><span class="lineno">34</span>$frac(1)$</div>
+<div class="line latex"><span class="lineno">35</span>$sum(1,2)$</div>
+<div class="line latex"><span class="lineno">36</span>$int(0,1,x)$</div>
+<div class="line latex"><span class="lineno">37</span>$lim(x,0)$</div>
+<div class="line latex"><span class="lineno">38</span>$matrix(a,b,c)$</div>
 </body>
 </html>

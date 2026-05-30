@@ -280,6 +280,7 @@ html_lines.append(".ok { background: #e8f5e9; padding: 6px; margin: 4px 0; }")
 html_lines.append(".warn { background: #fff3cd; padding: 6px; margin: 4px 0; border-left: 4px solid #ff9800; }")
 html_lines.append(".line { font-family: monospace; }")
 html_lines.append(".latex { color: #333; font-family: monospace; }")
+html_lines.append(".lineno { color: #777; display: inline-block; width: 48px; }")
 html_lines.append("</style>")
 html_lines.append("</head>")
 html_lines.append("<body>")
@@ -287,14 +288,18 @@ html_lines.append("<h1>UTCE MathConvert Highlight Report</h1>")
 
 html_lines.append("<h2>Warnings</h2>")
 if warnings:
-    for warning in warnings:
-        html_lines.append(f'<div class="warn">{html.escape(warning)}</div>')
+    for idx, warning in enumerate(warnings, start=1):
+        html_lines.append(
+            f'<div class="warn"><span class="lineno">{idx}</span>{html.escape(warning)}</div>'
+        )
 else:
     html_lines.append('<div class="ok">No warnings.</div>')
 
 html_lines.append("<h2>LaTeX Output</h2>")
-for line in latex_lines:
-    html_lines.append(f'<div class="line latex">{html.escape(line)}</div>')
+for idx, line in enumerate(latex_lines, start=1):
+    html_lines.append(
+        f'<div class="line latex"><span class="lineno">{idx}</span>{html.escape(line)}</div>'
+    )
 
 html_lines.append("</body>")
 html_lines.append("</html>")
