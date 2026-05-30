@@ -31,3 +31,8 @@ $\left\lceil n/3 \right\rceil$
 $\mu + \phi$
 $x_{1} + a_{n}$
 $y_{n+1}$
+$frac(1)$
+$sum(1,2)$
+$int(0,1,x)$
+$lim(x,0)$
+$matrix(a,b,c)$

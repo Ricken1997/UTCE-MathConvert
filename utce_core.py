@@ -171,6 +171,7 @@ if len(sys.argv) < 3 and "--help" not in sys.argv and "-h" not in sys.argv and "
 
 input_file = "test_input.txt"
 output_file = "output_latex.txt"
+warnings_file = "output_warnings.txt"
 
 if len(sys.argv) >= 2 and not sys.argv[1].startswith("-"):
     input_file = sys.argv[1]
@@ -255,6 +256,14 @@ with open(output_file, "w", encoding="utf-8") as f:
 
 print()
 print(f"Output saved to: {output_file}")
+
+with open(warnings_file, "w", encoding="utf-8") as f:
+    if warnings:
+        f.write("\n".join(warnings))
+    else:
+        f.write("No warnings.")
+
+print(f"Warnings saved to: {warnings_file}")
 
 if copy_to_clipboard:
     subprocess.run("pbcopy", text=True, input=latex)
