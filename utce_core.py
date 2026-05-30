@@ -303,6 +303,8 @@ html_lines.append("body { font-family: -apple-system, BlinkMacSystemFont, sans-s
 html_lines.append("h1 { font-size: 24px; }")
 html_lines.append(".ok { background: #e8f5e9; padding: 6px; margin: 4px 0; }")
 html_lines.append(".warn { background: #fff3cd; padding: 6px; margin: 4px 0; border-left: 4px solid #ff9800; }")
+html_lines.append(".summary { background: #f5f5f5; padding: 12px; margin: 12px 0; border-radius: 6px; }")
+html_lines.append(".summary div { margin: 4px 0; }")
 html_lines.append(".line { font-family: monospace; }")
 html_lines.append(".latex { color: #333; font-family: monospace; }")
 html_lines.append(".lineno { color: #777; display: inline-block; width: 48px; }")
@@ -310,6 +312,17 @@ html_lines.append("</style>")
 html_lines.append("</head>")
 html_lines.append("<body>")
 html_lines.append("<h1>UTCE MathConvert Highlight Report</h1>")
+
+input_line_count = len(lines)
+output_line_count = len(latex_lines)
+warning_count = len(warnings)
+
+html_lines.append("<h2>Summary</h2>")
+html_lines.append('<div class="summary">')
+html_lines.append(f"<div>Input Lines: {input_line_count}</div>")
+html_lines.append(f"<div>Output Lines: {output_line_count}</div>")
+html_lines.append(f"<div>Warnings: {warning_count}</div>")
+html_lines.append("</div>")
 
 html_lines.append("<h2>Warnings</h2>")
 if warnings:

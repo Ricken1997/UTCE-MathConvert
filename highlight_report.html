@@ -8,6 +8,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin: 24px;
 h1 { font-size: 24px; }
 .ok { background: #e8f5e9; padding: 6px; margin: 4px 0; }
 .warn { background: #fff3cd; padding: 6px; margin: 4px 0; border-left: 4px solid #ff9800; }
+.summary { background: #f5f5f5; padding: 12px; margin: 12px 0; border-radius: 6px; }
+.summary div { margin: 4px 0; }
 .line { font-family: monospace; }
 .latex { color: #333; font-family: monospace; }
 .lineno { color: #777; display: inline-block; width: 48px; }
@@ -15,6 +17,12 @@ h1 { font-size: 24px; }
 </head>
 <body>
 <h1>UTCE MathConvert Highlight Report</h1>
+<h2>Summary</h2>
+<div class="summary">
+<div>Input Lines: 38</div>
+<div>Output Lines: 38</div>
+<div>Warnings: 5</div>
+</div>
 <h2>Warnings</h2>
 <div class="warn"><span class="lineno">1</span><a href="#line-34">Line 34: Warning: frac requires 2 arguments, got 1: frac(1)</a></div>
 <div class="warn"><span class="lineno">2</span><a href="#line-35">Line 35: Warning: sum requires 4 arguments, got 2: sum(1,2)</a></div>
