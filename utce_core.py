@@ -314,16 +314,25 @@ html_lines.append("<h1>UTCE MathConvert Highlight Report</h1>")
 html_lines.append("<h2>Warnings</h2>")
 if warnings:
     for idx, warning in enumerate(warnings, start=1):
-        html_lines.append(
-            f'<div class="warn"><span class="lineno">{idx}</span>{html.escape(warning)}</div>'
-        )
+        line_match = re.search(r"Line (\d+):", warning)
+        if line_match:
+            source_line = line_match.group(1)
+            html_lines.append(
+                f'<div class="warn"><span class="lineno">{idx}</span>'
+                f'<a href="#line-{source_line}">{html.escape(warning)}</a></div>'
+            )
+        else:
+            html_lines.append(
+                f'<div class="warn"><span class="lineno">{idx}</span>{html.escape(warning)}</div>'
+            )
 else:
     html_lines.append('<div class="ok">No warnings.</div>')
 
 html_lines.append("<h2>LaTeX Output</h2>")
 for idx, line in enumerate(latex_lines, start=1):
     html_lines.append(
-        f'<div class="line latex"><span class="lineno">{idx}</span>{html.escape(line)}</div>'
+        f'<div class="line latex" id="line-{idx}">'
+        f'<span class="lineno">{idx}</span>{html.escape(line)}</div>'
     )
 
 html_lines.append("</body>")
