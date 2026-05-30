@@ -15,7 +15,6 @@ def validate_plain_math(expr):
         "int": 4,
         "lim": 3,
         "partial": 2,
-        "matrix": 4,
         "dot": 2,
         "cross": 2,
         "max": 2,
@@ -29,6 +28,28 @@ def validate_plain_math(expr):
             if len(parts) < required_count:
                 warnings.append(
                     f"Warning: {name} requires {required_count} arguments, got {len(parts)}: {expr}"
+                )
+
+    matrix_match = re.search(r"matrix\(([^)]*)\)", expr)
+
+    if matrix_match:
+        content = matrix_match.group(1)
+        rows = [row.strip() for row in content.split(";") if row.strip()]
+
+        if len(rows) < 2:
+            warnings.append(
+                f"Warning: matrix requires at least 2 rows separated by ';': {expr}"
+            )
+        else:
+            column_counts = []
+
+            for row in rows:
+                cols = [c.strip() for c in row.split(",") if c.strip()]
+                column_counts.append(len(cols))
+
+            if len(set(column_counts)) != 1:
+                warnings.append(
+                    f"Warning: matrix rows have inconsistent column counts: {expr}"
                 )
 
     return warnings
