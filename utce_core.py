@@ -6,6 +6,15 @@ import html
 
 VERSION = "3.0-beta"
 
+def classify_warning(warning):
+    if "requires" in warning:
+        return "ERROR"
+
+    if "unsupported" in warning:
+        return "WARNING"
+
+    return "INFO"
+
 def suggest_fix(expr):
     if expr.startswith("frac("):
         return "frac(numerator, denominator)"
@@ -241,13 +250,15 @@ for line_number, line in enumerate(lines, start=1):
         for warning in line_warnings:
             suggestion = suggest_fix(text)
 
+            severity = classify_warning(warning)
+
             if suggestion:
                 warnings.append(
-                    f"Line {line_number}: {warning} | Suggestion: {suggestion}"
+                    f"[{severity}] Line {line_number}: {warning} | Suggestion: {suggestion}"
                 )
             else:
                 warnings.append(
-                    f"Line {line_number}: {warning}"
+                    f"[{severity}] Line {line_number}: {warning}"
                 )
 
         latex_lines.append(
@@ -349,6 +360,14 @@ input_line_count = len(lines)
 output_line_count = len(latex_lines)
 warning_count = len(warnings)
 
+severity_counts = {}
+
+for warning in warnings:
+    match = re.search(r"\[([A-Z]+)\]", warning)
+    if match:
+        severity = match.group(1)
+        severity_counts[severity] = severity_counts.get(severity, 0) + 1
+
 warning_type_counts = {}
 
 for warning in warnings:
@@ -363,10 +382,16 @@ html_lines.append(f"<div>Input Lines: {input_line_count}</div>")
 html_lines.append(f"<div>Output Lines: {output_line_count}</div>")
 html_lines.append(f"<div>Warnings: {warning_count}</div>")
 
+if severity_counts:
+    html_lines.append("<div><strong>Severity:</strong></div>")
+    for severity, count in severity_counts.items():
+        html_lines.append(f"<div>{html.escape(severity)}: {count}</div>")
+
 if warning_type_counts:
     html_lines.append("<div><strong>Warning Types:</strong></div>")
     for warning_type, count in warning_type_counts.items():
         html_lines.append(f"<div>{html.escape(warning_type)}: {count}</div>")
+
 html_lines.append("</div>")
 
 html_lines.append("<h2>Warnings</h2>")

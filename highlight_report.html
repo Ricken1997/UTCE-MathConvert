@@ -24,6 +24,8 @@ h1 { font-size: 24px; }
 <div>Input Lines: 38</div>
 <div>Output Lines: 38</div>
 <div>Warnings: 5</div>
+<div><strong>Severity:</strong></div>
+<div>ERROR: 5</div>
 <div><strong>Warning Types:</strong></div>
 <div>frac: 1</div>
 <div>sum: 1</div>
@@ -32,19 +34,19 @@ h1 { font-size: 24px; }
 <div>matrix: 1</div>
 </div>
 <h2>Warnings</h2>
-<div class="warn"><span class="lineno">1</span><a href="#line-34">Line 34: Warning: frac requires 2 arguments, got 1: frac(1)</a></div>
+<div class="warn"><span class="lineno">1</span><a href="#line-34">[ERROR] Line 34: Warning: frac requires 2 arguments, got 1: frac(1)</a></div>
 <div class="suggestion"><span class="suggestion-label">Suggested Fix:</span> frac(numerator, denominator)</div>
 </div>
-<div class="warn"><span class="lineno">2</span><a href="#line-35">Line 35: Warning: sum requires 4 arguments, got 2: sum(1,2)</a></div>
+<div class="warn"><span class="lineno">2</span><a href="#line-35">[ERROR] Line 35: Warning: sum requires 4 arguments, got 2: sum(1,2)</a></div>
 <div class="suggestion"><span class="suggestion-label">Suggested Fix:</span> sum(index, start, end, expression)</div>
 </div>
-<div class="warn"><span class="lineno">3</span><a href="#line-36">Line 36: Warning: int requires 4 arguments, got 3: int(0,1,x)</a></div>
+<div class="warn"><span class="lineno">3</span><a href="#line-36">[ERROR] Line 36: Warning: int requires 4 arguments, got 3: int(0,1,x)</a></div>
 <div class="suggestion"><span class="suggestion-label">Suggested Fix:</span> int(start, end, expression, variable)</div>
 </div>
-<div class="warn"><span class="lineno">4</span><a href="#line-37">Line 37: Warning: lim requires 3 arguments, got 2: lim(x,0)</a></div>
+<div class="warn"><span class="lineno">4</span><a href="#line-37">[ERROR] Line 37: Warning: lim requires 3 arguments, got 2: lim(x,0)</a></div>
 <div class="suggestion"><span class="suggestion-label">Suggested Fix:</span> lim(variable, target, expression)</div>
 </div>
-<div class="warn"><span class="lineno">5</span><a href="#line-38">Line 38: Warning: matrix requires at least 2 rows separated by &#x27;;&#x27;: matrix(a,b,c)</a></div>
+<div class="warn"><span class="lineno">5</span><a href="#line-38">[ERROR] Line 38: Warning: matrix requires at least 2 rows separated by &#x27;;&#x27;: matrix(a,b,c)</a></div>
 <div class="suggestion"><span class="suggestion-label">Suggested Fix:</span> matrix(a,b;c,d)</div>
 </div>
 <h2>LaTeX Output</h2>
