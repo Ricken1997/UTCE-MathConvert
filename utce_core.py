@@ -6,6 +6,24 @@ import html
 
 VERSION = "3.0-beta"
 
+def suggest_fix(expr):
+    if expr.startswith("frac("):
+        return "frac(numerator, denominator)"
+
+    if expr.startswith("sum("):
+        return "sum(index, start, end, expression)"
+
+    if expr.startswith("int("):
+        return "int(start, end, expression, variable)"
+
+    if expr.startswith("lim("):
+        return "lim(variable, target, expression)"
+
+    if expr.startswith("matrix("):
+        return "matrix(a,b;c,d)"
+
+    return ""
+
 def validate_plain_math(expr):
     warnings = []
 
@@ -219,8 +237,13 @@ for line_number, line in enumerate(lines, start=1):
     if text:
         line_warnings = validate_plain_math(text)
 
-        for warning in line_warnings:
-            warnings.append(f"Line {line_number}: {warning}")
+    for warning in line_warnings:
+    suggestion = suggest_fix(text)
+
+    if suggestion:
+        warnings.append(f"Line {line_number}: {warning} | Suggestion: {suggestion}")
+    else:
+        warnings.append(f"Line {line_number}: {warning}")   
 
         latex_lines.append(plain_to_latex(text))
 
