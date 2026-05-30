@@ -338,6 +338,8 @@ html_lines.append(".summary div { margin: 4px 0; }")
 html_lines.append(".line { font-family: monospace; }")
 html_lines.append(".latex { color: #333; font-family: monospace; }")
 html_lines.append(".lineno { color: #777; display: inline-block; width: 48px; }")
+html_lines.append(".suggestion { margin-top: 6px; padding: 6px; background: #eef7ff; border-left: 4px solid #2196f3; font-family: monospace; }")
+html_lines.append(".suggestion-label { font-weight: bold; }")
 html_lines.append("</style>")
 html_lines.append("</head>")
 html_lines.append("<body>")
@@ -373,10 +375,26 @@ if warnings:
         line_match = re.search(r"Line (\d+):", warning)
         if line_match:
             source_line = line_match.group(1)
+            warning_text = warning
+            suggestion_text = ""
+
+            if " | Suggestion: " in warning:
+                warning_text, suggestion_text = warning.split(" | Suggestion: ", 1)
+
             html_lines.append(
                 f'<div class="warn"><span class="lineno">{idx}</span>'
-                f'<a href="#line-{source_line}">{html.escape(warning)}</a></div>'
+                f'<a href="#line-{source_line}">{html.escape(warning_text)}</a>'
+                f'</div>'
             )
+
+            if suggestion_text:
+                html_lines.append(
+                    f'<div class="suggestion"><span class="suggestion-label">Suggested Fix:</span> '
+                    f'{html.escape(suggestion_text)}</div>'
+                )
+
+            html_lines.append("</div>")
+
         else:
             html_lines.append(
                 f'<div class="warn"><span class="lineno">{idx}</span>{html.escape(warning)}</div>'
