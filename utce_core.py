@@ -234,18 +234,25 @@ warnings = []
 
 for line_number, line in enumerate(lines, start=1):
     text = line.strip()
+
     if text:
         line_warnings = validate_plain_math(text)
 
-    for warning in line_warnings:
-    suggestion = suggest_fix(text)
+        for warning in line_warnings:
+            suggestion = suggest_fix(text)
 
-    if suggestion:
-        warnings.append(f"Line {line_number}: {warning} | Suggestion: {suggestion}")
-    else:
-        warnings.append(f"Line {line_number}: {warning}")   
+            if suggestion:
+                warnings.append(
+                    f"Line {line_number}: {warning} | Suggestion: {suggestion}"
+                )
+            else:
+                warnings.append(
+                    f"Line {line_number}: {warning}"
+                )
 
-        latex_lines.append(plain_to_latex(text))
+        latex_lines.append(
+            plain_to_latex(text)
+        )
 
 if "--version" in sys.argv or "-v" in sys.argv:
     print(f"UTCE MathConvert {VERSION}")

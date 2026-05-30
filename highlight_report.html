@@ -30,11 +30,11 @@ h1 { font-size: 24px; }
 <div>matrix: 1</div>
 </div>
 <h2>Warnings</h2>
-<div class="warn"><span class="lineno">1</span><a href="#line-34">Line 34: Warning: frac requires 2 arguments, got 1: frac(1)</a></div>
-<div class="warn"><span class="lineno">2</span><a href="#line-35">Line 35: Warning: sum requires 4 arguments, got 2: sum(1,2)</a></div>
-<div class="warn"><span class="lineno">3</span><a href="#line-36">Line 36: Warning: int requires 4 arguments, got 3: int(0,1,x)</a></div>
-<div class="warn"><span class="lineno">4</span><a href="#line-37">Line 37: Warning: lim requires 3 arguments, got 2: lim(x,0)</a></div>
-<div class="warn"><span class="lineno">5</span><a href="#line-38">Line 38: Warning: matrix requires at least 2 rows separated by &#x27;;&#x27;: matrix(a,b,c)</a></div>
+<div class="warn"><span class="lineno">1</span><a href="#line-34">Line 34: Warning: frac requires 2 arguments, got 1: frac(1) | Suggestion: frac(numerator, denominator)</a></div>
+<div class="warn"><span class="lineno">2</span><a href="#line-35">Line 35: Warning: sum requires 4 arguments, got 2: sum(1,2) | Suggestion: sum(index, start, end, expression)</a></div>
+<div class="warn"><span class="lineno">3</span><a href="#line-36">Line 36: Warning: int requires 4 arguments, got 3: int(0,1,x) | Suggestion: int(start, end, expression, variable)</a></div>
+<div class="warn"><span class="lineno">4</span><a href="#line-37">Line 37: Warning: lim requires 3 arguments, got 2: lim(x,0) | Suggestion: lim(variable, target, expression)</a></div>
+<div class="warn"><span class="lineno">5</span><a href="#line-38">Line 38: Warning: matrix requires at least 2 rows separated by &#x27;;&#x27;: matrix(a,b,c) | Suggestion: matrix(a,b;c,d)</a></div>
 <h2>LaTeX Output</h2>
 <div class="line latex" id="line-1"><span class="lineno">1</span>$\frac{1}{2} + \sqrt{x^{2}}$</div>
 <div class="line latex" id="line-2"><span class="lineno">2</span>$\sum_{i=1}^{n} x^{i}$</div>
