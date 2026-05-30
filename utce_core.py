@@ -2,6 +2,7 @@ import subprocess
 import re
 import sys
 import os
+import html
 
 VERSION = "3.0-beta"
 
@@ -172,6 +173,7 @@ if len(sys.argv) < 3 and "--help" not in sys.argv and "-h" not in sys.argv and "
 input_file = "test_input.txt"
 output_file = "output_latex.txt"
 warnings_file = "output_warnings.txt"
+html_report_file = "highlight_report.html"
 
 if len(sys.argv) >= 2 and not sys.argv[1].startswith("-"):
     input_file = sys.argv[1]
@@ -264,6 +266,43 @@ with open(warnings_file, "w", encoding="utf-8") as f:
         f.write("No warnings.")
 
 print(f"Warnings saved to: {warnings_file}")
+
+html_lines = []
+html_lines.append("<!DOCTYPE html>")
+html_lines.append("<html>")
+html_lines.append("<head>")
+html_lines.append('<meta charset="utf-8">')
+html_lines.append("<title>UTCE MathConvert Highlight Report</title>")
+html_lines.append("<style>")
+html_lines.append("body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin: 24px; }")
+html_lines.append("h1 { font-size: 24px; }")
+html_lines.append(".ok { background: #e8f5e9; padding: 6px; margin: 4px 0; }")
+html_lines.append(".warn { background: #fff3cd; padding: 6px; margin: 4px 0; border-left: 4px solid #ff9800; }")
+html_lines.append(".line { font-family: monospace; }")
+html_lines.append(".latex { color: #333; font-family: monospace; }")
+html_lines.append("</style>")
+html_lines.append("</head>")
+html_lines.append("<body>")
+html_lines.append("<h1>UTCE MathConvert Highlight Report</h1>")
+
+html_lines.append("<h2>Warnings</h2>")
+if warnings:
+    for warning in warnings:
+        html_lines.append(f'<div class="warn">{html.escape(warning)}</div>')
+else:
+    html_lines.append('<div class="ok">No warnings.</div>')
+
+html_lines.append("<h2>LaTeX Output</h2>")
+for line in latex_lines:
+    html_lines.append(f'<div class="line latex">{html.escape(line)}</div>')
+
+html_lines.append("</body>")
+html_lines.append("</html>")
+
+with open(html_report_file, "w", encoding="utf-8") as f:
+    f.write("\n".join(html_lines))
+
+print(f"HTML report saved to: {html_report_file}")
 
 if copy_to_clipboard:
     subprocess.run("pbcopy", text=True, input=latex)
