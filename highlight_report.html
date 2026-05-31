@@ -37,6 +37,35 @@ h1 { font-size: 24px; }
 <div>matrix: 1</div>
 </div>
 <h2>Warnings</h2>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll("button[data-filter]").forEach(function (button) {
+        button.addEventListener("click", function () {
+            const level = button.getAttribute("data-filter");
+
+            document.querySelectorAll("[data-severity]").forEach(function (el) {
+                const show = level === "all" || el.getAttribute("data-severity") === level;
+                el.style.display = show ? "" : "none";
+
+                const next = el.nextElementSibling;
+                if (next && next.classList.contains("suggestion")) {
+                    next.style.display = show ? "" : "none";
+                }
+            });
+        });
+    });
+});
+</script>
+
+
+<div style="margin: 12px 0;">
+<button data-filter="all">All</button>
+<button data-filter="error">Error</button>
+<button data-filter="warning">Warning</button>
+<button data-filter="info">Info</button>
+</div>
+
 <div class="error" data-severity="error"><span class="lineno">1</span><a href="#line-34">[ERROR] Line 34: Warning: frac requires 2 arguments, got 1: frac(1)</a></div>
 <div class="suggestion"><span class="suggestion-label">Suggested Fix:</span> frac(numerator, denominator)</div>
 </div>

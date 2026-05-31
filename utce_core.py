@@ -397,6 +397,38 @@ if warning_type_counts:
 html_lines.append("</div>")
 
 html_lines.append("<h2>Warnings</h2>")
+
+html_lines.append("""
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll("button[data-filter]").forEach(function (button) {
+        button.addEventListener("click", function () {
+            const level = button.getAttribute("data-filter");
+
+            document.querySelectorAll("[data-severity]").forEach(function (el) {
+                const show = level === "all" || el.getAttribute("data-severity") === level;
+                el.style.display = show ? "" : "none";
+
+                const next = el.nextElementSibling;
+                if (next && next.classList.contains("suggestion")) {
+                    next.style.display = show ? "" : "none";
+                }
+            });
+        });
+    });
+});
+</script>
+""")
+
+html_lines.append("""
+<div style="margin: 12px 0;">
+<button data-filter="all">All</button>
+<button data-filter="error">Error</button>
+<button data-filter="warning">Warning</button>
+<button data-filter="info">Info</button>
+</div>
+""")
+
 if warnings:
     for idx, warning in enumerate(warnings, start=1):
         css_class = "warn"
