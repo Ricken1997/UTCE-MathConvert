@@ -240,6 +240,7 @@ with open(input_file, "r", encoding="utf-8") as f:
 latex_lines = []
 
 warnings = []
+severity_counts = {}
 
 for line_number, line in enumerate(lines, start=1):
     text = line.strip()
@@ -364,8 +365,6 @@ input_line_count = len(lines)
 output_line_count = len(latex_lines)
 warning_count = len(warnings)
 
-severity_counts = {}
-
 for warning in warnings:
     match = re.search(r"\[([A-Z]+)\]", warning)
     if match:
@@ -401,6 +400,13 @@ html_lines.append("</div>")
 html_lines.append("<h2>Warnings</h2>")
 if warnings:
     for idx, warning in enumerate(warnings, start=1):
+        css_class = "warn"
+        if "[ERROR]" in warning:
+            css_class = "error"
+        elif "[WARNING]" in warning:
+            css_class = "warning"
+        elif "[INFO]" in warning:
+            css_class = "info"
         line_match = re.search(r"Line (\d+):", warning)
         if line_match:
             source_line = line_match.group(1)
@@ -411,7 +417,7 @@ if warnings:
                 warning_text, suggestion_text = warning.split(" | Suggestion: ", 1)
 
             html_lines.append(
-                f'<div class="warn"><span class="lineno">{idx}</span>'
+                f'<div class="{css_class}"><span class="lineno">{idx}</span>'
                 f'<a href="#line-{source_line}">{html.escape(warning_text)}</a>'
                 f'</div>'
             )
@@ -426,7 +432,7 @@ if warnings:
 
         else:
             html_lines.append(
-                f'<div class="warn"><span class="lineno">{idx}</span>{html.escape(warning)}</div>'
+                f'<div class="{css_class}"><span class="lineno">{idx}</span>{html.escape(warning)}</div>'
             )
 else:
     html_lines.append('<div class="ok">No warnings.</div>')
