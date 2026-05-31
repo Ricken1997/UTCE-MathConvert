@@ -251,6 +251,7 @@ for line_number, line in enumerate(lines, start=1):
             suggestion = suggest_fix(text)
 
             severity = classify_warning(warning)
+            severity_counts[severity] = severity_counts.get(severity, 0) + 1
 
             if suggestion:
                 warnings.append(
@@ -344,6 +345,9 @@ html_lines.append("body { font-family: -apple-system, BlinkMacSystemFont, sans-s
 html_lines.append("h1 { font-size: 24px; }")
 html_lines.append(".ok { background: #e8f5e9; padding: 6px; margin: 4px 0; }")
 html_lines.append(".warn { background: #fff3cd; padding: 6px; margin: 4px 0; border-left: 4px solid #ff9800; }")
+html_lines.append(".error { background:#ffe6e6; border-left:4px solid #cc0000; padding:6px; margin:4px 0; }")
+html_lines.append(".warning { background:#fff8d6; border-left:4px solid #e6b800; padding:6px; margin:4px 0; }")
+html_lines.append(".info { background:#eef7ff; border-left:4px solid #3399ff; padding:6px; margin:4px 0; }")
 html_lines.append(".summary { background: #f5f5f5; padding: 12px; margin: 12px 0; border-radius: 6px; }")
 html_lines.append(".summary div { margin: 4px 0; }")
 html_lines.append(".line { font-family: monospace; }")

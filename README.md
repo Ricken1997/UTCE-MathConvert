@@ -56,3 +56,50 @@ Warning: sum requires 4 arguments, got 2
 Warning: int requires 4 arguments, got 3
 Warning: lim requires 3 arguments, got 2
 Warning: matrix requires 4 arguments, got 3
+
+# Version 5.0
+
+## Diagnostic Engine Milestone
+
+UTCE MathConvert has evolved from a plain-text mathematical converter into a diagnostic conversion engine.
+
+New capabilities include:
+
+* Warning detection for malformed expressions
+* Severity classification (ERROR / WARNING / INFO)
+* Suggested fix generation
+* Highlight Report HTML output
+* Warning statistics and summary panel
+* Inline diagnostic reporting
+
+Example:
+
+Input:
+frac(1)
+
+Output Warning:
+[ERROR] Line 34: frac requires 2 arguments, got 1
+
+Suggested Fix:
+frac(numerator, denominator)
+
+This version establishes the foundation for future semantic validation and academic writing support.
+
+## v5.0 Diagnostic Engine Milestone
+
+UTCE MathConvert is no longer only a plain-to-LaTeX converter.  
+It now functions as a lightweight diagnostic conversion engine.
+
+Core features:
+
+- Plain text to LaTeX conversion
+- Inline / block / raw output modes
+- Warning detection
+- Source line tracking
+- HTML highlight report
+- Clickable warning links
+- Suggested fix panel
+- Severity labels: ERROR / WARNING / INFO
+- Warning type summary
+
+This version marks the transition from simple conversion to diagnostic-assisted conversion.
