@@ -369,7 +369,6 @@ for warning in warnings:
     match = re.search(r"\[([A-Z]+)\]", warning)
     if match:
         severity = match.group(1)
-        severity_counts[severity] = severity_counts.get(severity, 0) + 1
 
 warning_type_counts = {}
 
