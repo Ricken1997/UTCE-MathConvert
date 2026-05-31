@@ -416,7 +416,7 @@ if warnings:
                 warning_text, suggestion_text = warning.split(" | Suggestion: ", 1)
 
             html_lines.append(
-                f'<div class="{css_class}"><span class="lineno">{idx}</span>'
+                f'<div class="{css_class}" data-severity="{css_class}"><span class="lineno">{idx}</span>'
                 f'<a href="#line-{source_line}">{html.escape(warning_text)}</a>'
                 f'</div>'
             )
@@ -431,7 +431,7 @@ if warnings:
 
         else:
             html_lines.append(
-                f'<div class="{css_class}"><span class="lineno">{idx}</span>{html.escape(warning)}</div>'
+                f'<div class="{css_class}" data-severity="{css_class}"><span class="lineno">{idx}</span>{html.escape(warning)}</div>'
             )
 else:
     html_lines.append('<div class="ok">No warnings.</div>')
