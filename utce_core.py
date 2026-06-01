@@ -421,11 +421,18 @@ document.addEventListener("DOMContentLoaded", function () {
 """)
 
 html_lines.append("""
-<div style="margin: 12px 0;">
+<div style="margin:12px 0;">
 <button data-filter="all">All</button>
 <button data-filter="error">Error</button>
 <button data-filter="warning">Warning</button>
 <button data-filter="info">Info</button>
+</div>
+
+<div style="margin:8px 0 12px 0;">
+<input id="warningSearch"
+       type="text"
+       placeholder="Search warnings..."
+       style="padding:4px; width:240px;">
 </div>
 """)
 
