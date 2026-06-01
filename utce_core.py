@@ -399,28 +399,6 @@ html_lines.append("</div>")
 html_lines.append("<h2>Warnings</h2>")
 
 html_lines.append("""
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    document.querySelectorAll("button[data-filter]").forEach(function (button) {
-        button.addEventListener("click", function () {
-            const level = button.getAttribute("data-filter");
-
-            document.querySelectorAll("[data-severity]").forEach(function (el) {
-                const show = level === "all" || el.getAttribute("data-severity") === level;
-                el.style.display = show ? "" : "none";
-
-                const next = el.nextElementSibling;
-                if (next && next.classList.contains("suggestion")) {
-                    next.style.display = show ? "" : "none";
-                }
-            });
-        });
-    });
-});
-</script>
-""")
-
-html_lines.append("""
 <div style="margin:12px 0;">
 <button data-filter="all">All</button>
 <button data-filter="error">Error</button>
@@ -481,6 +459,48 @@ for idx, line in enumerate(latex_lines, start=1):
         f'<div class="line latex" id="line-{idx}">'
         f'<span class="lineno">{idx}</span>{html.escape(line)}</div>'
     )
+
+html_lines.append("""
+<script>
+function applyFilters() {
+    const keywordInput = document.getElementById("warningSearch");
+    const keyword = keywordInput ? keywordInput.value.toLowerCase() : "";
+    const active = window.currentSeverity || "all";
+
+    document.querySelectorAll("[data-severity]").forEach(function (el) {
+        const severity = el.getAttribute("data-severity");
+        const text = (
+            el.textContent + " " +
+            el.getAttribute("data-severity") + " " +
+            el.className
+        ).toLowerCase();
+
+        const severityMatch = active === "all" || severity === active;
+        const keywordMatch = keyword === "" || text.includes(keyword);
+
+        const show = severityMatch && keywordMatch;
+        el.style.display = show ? "" : "none";
+
+        const next = el.nextElementSibling;
+        if (next && next.classList.contains("suggestion")) {
+            next.style.display = show ? "" : "none";
+        }
+    });
+}
+
+document.querySelectorAll("button[data-filter]").forEach(function (button) {
+    button.addEventListener("click", function () {
+        window.currentSeverity = button.getAttribute("data-filter");
+        applyFilters();
+    });
+});
+
+const searchInput = document.getElementById("warningSearch");
+if (searchInput) {
+    searchInput.addEventListener("input", applyFilters);
+}
+</script>
+""")
 
 html_lines.append("</body>")
 html_lines.append("</html>")
