@@ -4,8 +4,20 @@ import sys
 import os
 import html
 
-VERSION = "5.7-cleanup"
+VERSION = "5.8-refactor-core"
 
+STRUCTURAL_CORE = {
+    "observer": "User intention / conversion purpose",
+    "theory": "Plain math to LaTeX conversion and validation rules",
+    "reality": "LaTeX constraints, document constraints, journal constraints",
+    "target": "Input mathematical expression or document structure",
+    "time": "Input → warning → fix → reconversion",
+}
+
+
+# ============================================================
+# Diagnosis Engine
+# ============================================================
 
 def classify_warning(warning):
     if "requires" in warning:
@@ -78,6 +90,20 @@ def validate_plain_math(expr):
 
     return warnings
 
+
+def parse_warning_type(warning):
+    match = re.search(r"Warning: ([a-zA-Z_]+)", warning)
+    return match.group(1) if match else "unknown"
+
+
+def parse_source_line(warning):
+    match = re.search(r"Line (\d+):", warning)
+    return match.group(1) if match else ""
+
+
+# ============================================================
+# Conversion Engine
+# ============================================================
 
 def plain_to_latex(expr):
     expr = re.sub(r"frac\((\d+),(\d+)\)", r"\\frac{\1}{\2}", expr)
@@ -176,18 +202,6 @@ def plain_to_latex(expr):
     return "$" + expr + "$"
 
 
-def print_usage():
-    print()
-    print(f"UTCE MathConvert {VERSION}")
-    print()
-    print("Usage:")
-    print("  python3 utce_core.py input.txt output.txt --inline")
-    print("  python3 utce_core.py input.txt output.txt --block")
-    print("  python3 utce_core.py input.txt output.txt --raw")
-    print("  python3 utce_core.py input.txt output.txt --inline --copy")
-    print()
-
-
 def build_latex_output(latex_lines, mode):
     if mode == "--block":
         return "\n".join([r"\[" + line.strip("$") + r"\]" for line in latex_lines])
@@ -196,17 +210,76 @@ def build_latex_output(latex_lines, mode):
     return "\n".join(latex_lines)
 
 
-def parse_warning_type(warning):
-    match = re.search(r"Warning: ([a-zA-Z_]+)", warning)
-    return match.group(1) if match else "unknown"
+# ============================================================
+# Analysis Engine
+# ============================================================
+
+def analyze_lines(lines):
+    latex_lines = []
+    warnings = []
+    severity_counts = {}
+
+    for line_number, line in enumerate(lines, start=1):
+        text = line.strip()
+
+        if not text:
+            continue
+
+        line_warnings = validate_plain_math(text)
+
+        for warning in line_warnings:
+            suggestion = suggest_fix(text)
+            severity = classify_warning(warning)
+            severity_counts[severity] = severity_counts.get(severity, 0) + 1
+
+            if suggestion:
+                warnings.append(
+                    f"[{severity}] Line {line_number}: {warning} | Suggestion: {suggestion}"
+                )
+            else:
+                warnings.append(
+                    f"[{severity}] Line {line_number}: {warning}"
+                )
+
+        latex_lines.append(plain_to_latex(text))
+
+    return latex_lines, warnings, severity_counts
 
 
-def parse_source_line(warning):
-    match = re.search(r"Line (\d+):", warning)
-    return match.group(1) if match else ""
+# ============================================================
+# Report Engine
+# ============================================================
+
+def build_html_head():
+    lines = []
+    lines.append("<!DOCTYPE html>")
+    lines.append("<html>")
+    lines.append("<head>")
+    lines.append('<meta charset="utf-8">')
+    lines.append("<title>UTCE MathConvert Highlight Report</title>")
+    lines.append("<style>")
+    lines.append("body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin: 24px; }")
+    lines.append("h1 { font-size: 24px; }")
+    lines.append(".ok { background: #e8f5e9; padding: 6px; margin: 4px 0; }")
+    lines.append(".error { background:#ffe6e6; border-left:4px solid #cc0000; padding:6px; margin:4px 0; }")
+    lines.append(".warning { background:#fff8d6; border-left:4px solid #e6b800; padding:6px; margin:4px 0; }")
+    lines.append(".info { background:#eef7ff; border-left:4px solid #3399ff; padding:6px; margin:4px 0; }")
+    lines.append(".summary { background:#f5f5f5; padding:12px; margin:12px 0; border-radius:6px; }")
+    lines.append(".summary div { margin:4px 0; }")
+    lines.append(".line { font-family:monospace; }")
+    lines.append(".latex { color:#333; font-family:monospace; }")
+    lines.append(".lineno { color:#777; display:inline-block; width:48px; }")
+    lines.append(".suggestion { margin-top:6px; padding:6px; background:#eef7ff; border-left:4px solid #2196f3; font-family:monospace; }")
+    lines.append(".suggestion-label { font-weight:bold; }")
+    lines.append("button { margin-right:4px; padding:3px 8px; }")
+    lines.append("</style>")
+    lines.append("</head>")
+    lines.append("<body>")
+    lines.append("<h1>UTCE MathConvert Highlight Report</h1>")
+    return lines
 
 
-def build_html_report(lines, latex_lines, warnings, severity_counts, html_report_file):
+def build_summary_section(lines, latex_lines, warnings, severity_counts):
     warning_type_counts = {}
 
     for warning in warnings:
@@ -214,33 +287,6 @@ def build_html_report(lines, latex_lines, warnings, severity_counts, html_report
         warning_type_counts[warning_type] = warning_type_counts.get(warning_type, 0) + 1
 
     html_lines = []
-
-    html_lines.append("<!DOCTYPE html>")
-    html_lines.append("<html>")
-    html_lines.append("<head>")
-    html_lines.append('<meta charset="utf-8">')
-    html_lines.append("<title>UTCE MathConvert Highlight Report</title>")
-    html_lines.append("<style>")
-    html_lines.append("body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin: 24px; }")
-    html_lines.append("h1 { font-size: 24px; }")
-    html_lines.append(".ok { background: #e8f5e9; padding: 6px; margin: 4px 0; }")
-    html_lines.append(".error { background:#ffe6e6; border-left:4px solid #cc0000; padding:6px; margin:4px 0; }")
-    html_lines.append(".warning { background:#fff8d6; border-left:4px solid #e6b800; padding:6px; margin:4px 0; }")
-    html_lines.append(".info { background:#eef7ff; border-left:4px solid #3399ff; padding:6px; margin:4px 0; }")
-    html_lines.append(".summary { background:#f5f5f5; padding:12px; margin:12px 0; border-radius:6px; }")
-    html_lines.append(".summary div { margin:4px 0; }")
-    html_lines.append(".line { font-family:monospace; }")
-    html_lines.append(".latex { color:#333; font-family:monospace; }")
-    html_lines.append(".lineno { color:#777; display:inline-block; width:48px; }")
-    html_lines.append(".suggestion { margin-top:6px; padding:6px; background:#eef7ff; border-left:4px solid #2196f3; font-family:monospace; }")
-    html_lines.append(".suggestion-label { font-weight:bold; }")
-    html_lines.append("button { margin-right:4px; padding:3px 8px; }")
-    html_lines.append("</style>")
-    html_lines.append("</head>")
-    html_lines.append("<body>")
-
-    html_lines.append("<h1>UTCE MathConvert Highlight Report</h1>")
-
     html_lines.append("<h2>Summary</h2>")
     html_lines.append('<div class="summary">')
     html_lines.append(f"<div>Input Lines: {len(lines)}</div>")
@@ -258,10 +304,13 @@ def build_html_report(lines, latex_lines, warnings, severity_counts, html_report
             html_lines.append(f"<div>{html.escape(warning_type)}: {count}</div>")
 
     html_lines.append("</div>")
+    return html_lines
 
-    html_lines.append("<h2>Warnings</h2>")
 
-    html_lines.append("""
+def build_warning_controls():
+    return ["""
+<h2>Warnings</h2>
+
 <div style="margin:12px 0;">
 <button data-filter="all">All</button>
 <button data-filter="error">Error</button>
@@ -275,62 +324,77 @@ def build_html_report(lines, latex_lines, warnings, severity_counts, html_report
        placeholder="Search warnings..."
        style="padding:4px; width:240px;">
 </div>
-""")
+"""]
 
-    if warnings:
-        for idx, warning in enumerate(warnings, start=1):
+
+def build_warning_list(warnings):
+    html_lines = []
+
+    if not warnings:
+        html_lines.append('<div class="ok">No warnings.</div>')
+        return html_lines
+
+    for idx, warning in enumerate(warnings, start=1):
+        css_class = "info"
+
+        if "[ERROR]" in warning:
+            css_class = "error"
+        elif "[WARNING]" in warning:
+            css_class = "warning"
+        elif "[INFO]" in warning:
             css_class = "info"
 
-            if "[ERROR]" in warning:
-                css_class = "error"
-            elif "[WARNING]" in warning:
-                css_class = "warning"
-            elif "[INFO]" in warning:
-                css_class = "info"
+        source_line = parse_source_line(warning)
+        warning_type = parse_warning_type(warning)
 
-            source_line = parse_source_line(warning)
-            warning_type = parse_warning_type(warning)
+        warning_text = warning
+        suggestion_text = ""
 
-            warning_text = warning
-            suggestion_text = ""
+        if " | Suggestion: " in warning:
+            warning_text, suggestion_text = warning.split(" | Suggestion: ", 1)
 
-            if " | Suggestion: " in warning:
-                warning_text, suggestion_text = warning.split(" | Suggestion: ", 1)
+        if source_line:
+            html_lines.append(
+                f'<div class="{css_class}" '
+                f'data-severity="{css_class}" '
+                f'data-warning-type="{html.escape(warning_type)}">'
+                f'<span class="lineno">{idx}</span>'
+                f'<a href="#line-{source_line}">{html.escape(warning_text)}</a>'
+                f'</div>'
+            )
+        else:
+            html_lines.append(
+                f'<div class="{css_class}" '
+                f'data-severity="{css_class}" '
+                f'data-warning-type="{html.escape(warning_type)}">'
+                f'<span class="lineno">{idx}</span>{html.escape(warning_text)}'
+                f'</div>'
+            )
 
-            if source_line:
-                html_lines.append(
-                    f'<div class="{css_class}" '
-                    f'data-severity="{css_class}" '
-                    f'data-warning-type="{html.escape(warning_type)}">'
-                    f'<span class="lineno">{idx}</span>'
-                    f'<a href="#line-{source_line}">{html.escape(warning_text)}</a>'
-                    f'</div>'
-                )
-            else:
-                html_lines.append(
-                    f'<div class="{css_class}" '
-                    f'data-severity="{css_class}" '
-                    f'data-warning-type="{html.escape(warning_type)}">'
-                    f'<span class="lineno">{idx}</span>{html.escape(warning_text)}'
-                    f'</div>'
-                )
+        if suggestion_text:
+            html_lines.append(
+                f'<div class="suggestion"><span class="suggestion-label">Suggested Fix:</span> '
+                f'{html.escape(suggestion_text)}</div>'
+            )
 
-            if suggestion_text:
-                html_lines.append(
-                    f'<div class="suggestion"><span class="suggestion-label">Suggested Fix:</span> '
-                    f'{html.escape(suggestion_text)}</div>'
-                )
-    else:
-        html_lines.append('<div class="ok">No warnings.</div>')
+    return html_lines
 
+
+def build_latex_output_panel(latex_lines):
+    html_lines = []
     html_lines.append("<h2>LaTeX Output</h2>")
+
     for idx, line in enumerate(latex_lines, start=1):
         html_lines.append(
             f'<div class="line latex" id="line-{idx}">'
             f'<span class="lineno">{idx}</span>{html.escape(line)}</div>'
         )
 
-    html_lines.append("""
+    return html_lines
+
+
+def build_javascript():
+    return ["""
 <script>
 function applyFilters() {
     const keywordInput = document.getElementById("warningSearch");
@@ -373,13 +437,38 @@ if (searchInput) {
     searchInput.addEventListener("input", applyFilters);
 }
 </script>
-""")
+"""]
 
+
+def build_html_report(lines, latex_lines, warnings, severity_counts, html_report_file):
+    html_lines = []
+    html_lines.extend(build_html_head())
+    html_lines.extend(build_summary_section(lines, latex_lines, warnings, severity_counts))
+    html_lines.extend(build_warning_controls())
+    html_lines.extend(build_warning_list(warnings))
+    html_lines.extend(build_latex_output_panel(latex_lines))
+    html_lines.extend(build_javascript())
     html_lines.append("</body>")
     html_lines.append("</html>")
 
     with open(html_report_file, "w", encoding="utf-8") as f:
         f.write("\n".join(html_lines))
+
+
+# ============================================================
+# CLI
+# ============================================================
+
+def print_usage():
+    print()
+    print(f"UTCE MathConvert {VERSION}")
+    print()
+    print("Usage:")
+    print("  python3 utce_core.py input.txt output.txt --inline")
+    print("  python3 utce_core.py input.txt output.txt --block")
+    print("  python3 utce_core.py input.txt output.txt --raw")
+    print("  python3 utce_core.py input.txt output.txt --inline --copy")
+    print()
 
 
 def main():
@@ -422,31 +511,7 @@ def main():
     with open(input_file, "r", encoding="utf-8") as f:
         lines = f.readlines()
 
-    latex_lines = []
-    warnings = []
-    severity_counts = {}
-
-    for line_number, line in enumerate(lines, start=1):
-        text = line.strip()
-
-        if text:
-            line_warnings = validate_plain_math(text)
-
-            for warning in line_warnings:
-                suggestion = suggest_fix(text)
-                severity = classify_warning(warning)
-                severity_counts[severity] = severity_counts.get(severity, 0) + 1
-
-                if suggestion:
-                    warnings.append(
-                        f"[{severity}] Line {line_number}: {warning} | Suggestion: {suggestion}"
-                    )
-                else:
-                    warnings.append(
-                        f"[{severity}] Line {line_number}: {warning}"
-                    )
-
-            latex_lines.append(plain_to_latex(text))
+    latex_lines, warnings, severity_counts = analyze_lines(lines)
 
     latex = build_latex_output(latex_lines, mode)
 
