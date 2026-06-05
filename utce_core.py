@@ -14,6 +14,44 @@ STRUCTURAL_CORE = {
     "time": "Input → warning → fix → reconversion",
 }
 
+class WarningInfo:
+    def __init__(
+        self,
+        line_number,
+        severity,
+        warning_type,
+        message,
+        suggestion=""
+    ):
+        self.line_number = line_number
+        self.severity = severity
+        self.warning_type = warning_type
+        self.message = message
+        self.suggestion = suggestion
+
+    def to_dict(self):
+        return {
+            "line_number": self.line_number,
+            "severity": self.severity,
+            "warning_type": self.warning_type,
+            "message": self.message,
+            "suggestion": self.suggestion,
+        }
+
+    def calculate_confidence_score(
+    observer_clarity,
+    theory_fit,
+    reality_compatibility,
+    target_coherence,
+    temporal_stability
+    ):
+        return (
+            observer_clarity
+            + theory_fit
+            + reality_compatibility
+            + target_coherence
+            + temporal_stability
+        ) / 5    
 
 # ============================================================
 # Diagnosis Engine
