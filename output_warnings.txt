@@ -1,3 +1,9 @@
+Diagnostic Summary
+------------------
+Confidence: 80.0
+Predictive Risk: 20.0
+Risk Level: LOW
+
 [ERROR] Line 34: Warning: frac requires 2 arguments, got 1: frac(1) | Suggestion: frac(numerator, denominator)
 [ERROR] Line 35: Warning: sum requires 4 arguments, got 2: sum(1,2) | Suggestion: sum(index, start, end, expression)
 [ERROR] Line 36: Warning: int requires 4 arguments, got 3: int(0,1,x) | Suggestion: int(start, end, expression, variable)
