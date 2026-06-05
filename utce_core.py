@@ -21,13 +21,17 @@ class WarningInfo:
         severity,
         warning_type,
         message,
-        suggestion=""
+        suggestion="",
+        confidence=100,
+        risk_score=0
     ):
         self.line_number = line_number
         self.severity = severity
         self.warning_type = warning_type
         self.message = message
         self.suggestion = suggestion
+        self.confidence = confidence
+        self.risk_score = risk_score
 
     def to_dict(self):
         return {
@@ -36,22 +40,56 @@ class WarningInfo:
             "warning_type": self.warning_type,
             "message": self.message,
             "suggestion": self.suggestion,
+            "confidence": self.confidence,
+            "risk_score": self.risk_score,
         }
 
-    def calculate_confidence_score(
+
+def calculate_confidence_score(
     observer_clarity,
     theory_fit,
     reality_compatibility,
     target_coherence,
     temporal_stability
-    ):
-        return (
-            observer_clarity
-            + theory_fit
-            + reality_compatibility
-            + target_coherence
-            + temporal_stability
-        ) / 5    
+):
+    return (
+        observer_clarity
+        + theory_fit
+        + reality_compatibility
+        + target_coherence
+        + temporal_stability
+    ) / 5
+
+
+def calculate_risk_score(severity):
+    if severity == "ERROR":
+        return 80
+
+    if severity == "WARNING":
+        return 50
+
+    return 20
+
+
+def create_warning_info(
+    line_number,
+    severity,
+    warning_type,
+    message,
+    suggestion=""
+):
+    confidence = calculate_confidence_score(80, 80, 80, 80, 80)
+    risk_score = calculate_risk_score(severity)
+
+    return WarningInfo(
+        line_number=line_number,
+        severity=severity,
+        warning_type=warning_type,
+        message=message,
+        suggestion=suggestion,
+        confidence=confidence,
+        risk_score=risk_score,
+    )
 
 # ============================================================
 # Diagnosis Engine
@@ -222,20 +260,20 @@ def plain_to_latex(expr):
     }
 
     for plain, latex in greek.items():
-        expr = re.sub(rf"\b{plain}\b", latex, expr)
+        expr = re.sub(rf"\b{plain}\b", lambda m, latex=latex: latex, expr)
 
-    expr = re.sub(r"\bpi\b", r"\\pi", expr)
+        expr = re.sub(r"\bpi\b", r"\\pi", expr)
 
-    expr = expr.replace("<=", r"\le ")
-    expr = expr.replace(">=", r"\ge ")
-    expr = expr.replace("!=", r"\ne ")
-    expr = expr.replace("<->", r"\leftrightarrow ")
-    expr = expr.replace("->", r"\to ")
-    expr = expr.replace("*", r"\cdot ")
-
-    expr = re.sub(r"([A-Za-z])_([0-9A-Za-z])", r"\1_{\2}", expr)
-    expr = re.sub(r"([A-Za-z])_\(([^()]*)\)", r"\1_{\2}", expr)
-    expr = re.sub(r"([A-Za-z])\^([0-9A-Za-z])", r"\1^{\2}", expr)
+        expr = expr.replace("<=", r"\le ")
+        expr = expr.replace(">=", r"\ge ")
+        expr = expr.replace("!=", r"\ne ")
+        expr = expr.replace("<->", r"\leftrightarrow ")
+        expr = expr.replace("->", r"\to ")
+        expr = expr.replace("*", r"\cdot ")
+        
+        expr = re.sub(r"([A-Za-z])_([0-9A-Za-z])", r"\1_{\2}", expr)
+        expr = re.sub(r"([A-Za-z])_\(([^()]*)\)", r"\1_{\2}", expr)
+        expr = re.sub(r"([A-Za-z])\^([0-9A-Za-z])", r"\1^{\2}", expr)
 
     return "$" + expr + "$"
 
