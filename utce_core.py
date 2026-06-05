@@ -91,6 +91,83 @@ def create_warning_info(
         risk_score=risk_score,
     )
 
+class StructuralDiagnosis:
+    def __init__(
+        self,
+        observer_clarity=80,
+        theory_fit=80,
+        reality_compatibility=80,
+        target_coherence=80,
+        temporal_stability=80,
+        residual_risk=20,
+        meta_diagnostic_risk=20,
+        cross_application_validation=80
+    ):
+        self.observer_clarity = observer_clarity
+        self.theory_fit = theory_fit
+        self.reality_compatibility = reality_compatibility
+        self.target_coherence = target_coherence
+        self.temporal_stability = temporal_stability
+        self.residual_risk = residual_risk
+        self.meta_diagnostic_risk = meta_diagnostic_risk
+        self.cross_application_validation = cross_application_validation
+
+        self.confidence_score = calculate_confidence_score(
+            observer_clarity,
+            theory_fit,
+            reality_compatibility,
+            target_coherence,
+            temporal_stability
+        )
+
+        self.predictive_risk = self.calculate_predictive_risk()
+
+    def calculate_predictive_risk(self):
+        return (
+            (100 - self.confidence_score)
+            + self.residual_risk
+            + (100 - self.temporal_stability)
+            + self.meta_diagnostic_risk
+            + (100 - self.cross_application_validation)
+        ) / 5
+
+    def risk_level(self):
+        if self.predictive_risk >= 80:
+            return "CRITICAL"
+        if self.predictive_risk >= 60:
+            return "HIGH"
+        if self.predictive_risk >= 40:
+            return "MODERATE"
+        if self.predictive_risk >= 20:
+            return "LOW"
+        return "MINIMAL"
+
+    def recommendation(self):
+        level = self.risk_level()
+
+        if level == "CRITICAL":
+            return "Immediate structural review required."
+        if level == "HIGH":
+            return "Review warning source and apply suggested fixes before reuse."
+        if level == "MODERATE":
+            return "Proceed with caution and verify output manually."
+        if level == "LOW":
+            return "Output is mostly stable, but minor review is recommended."
+        return "Output is structurally stable."
+
+    def to_dict(self):
+        return {
+            "observer_clarity": self.observer_clarity,
+            "theory_fit": self.theory_fit,
+            "reality_compatibility": self.reality_compatibility,
+            "target_coherence": self.target_coherence,
+            "temporal_stability": self.temporal_stability,
+            "confidence_score": self.confidence_score,
+            "predictive_risk": self.predictive_risk,
+            "risk_level": self.risk_level(),
+            "recommendation": self.recommendation(),
+        }
+
 # ============================================================
 # Diagnosis Engine
 # ============================================================
@@ -175,7 +252,6 @@ def parse_warning_type(warning):
 def parse_source_line(warning):
     match = re.search(r"Line (\d+):", warning)
     return match.group(1) if match else ""
-
 
 # ============================================================
 # Conversion Engine
@@ -270,7 +346,7 @@ def plain_to_latex(expr):
         expr = expr.replace("<->", r"\leftrightarrow ")
         expr = expr.replace("->", r"\to ")
         expr = expr.replace("*", r"\cdot ")
-        
+
         expr = re.sub(r"([A-Za-z])_([0-9A-Za-z])", r"\1_{\2}", expr)
         expr = re.sub(r"([A-Za-z])_\(([^()]*)\)", r"\1_{\2}", expr)
         expr = re.sub(r"([A-Za-z])\^([0-9A-Za-z])", r"\1^{\2}", expr)
@@ -294,6 +370,21 @@ def analyze_lines(lines):
     latex_lines = []
     warnings = []
     severity_counts = {}
+
+    diagnosis = StructuralDiagnosis(
+    observer_clarity=80,
+    theory_fit=80,
+    reality_compatibility=80,
+    target_coherence=80,
+    temporal_stability=80,
+    residual_risk=20,
+    meta_diagnostic_risk=20,
+    cross_application_validation=80
+    )
+
+    print("Confidence:", diagnosis.confidence_score)
+    print("Predictive Risk:", diagnosis.predictive_risk)
+    print("Risk Level:", diagnosis.risk_level())
 
     for line_number, line in enumerate(lines, start=1):
         text = line.strip()
@@ -320,7 +411,6 @@ def analyze_lines(lines):
         latex_lines.append(plain_to_latex(text))
 
     return latex_lines, warnings, severity_counts
-
 
 # ============================================================
 # Report Engine
