@@ -430,6 +430,9 @@ def build_html_head():
     lines.append(".error { background:#ffe6e6; border-left:4px solid #cc0000; padding:6px; margin:4px 0; }")
     lines.append(".warning { background:#fff8d6; border-left:4px solid #e6b800; padding:6px; margin:4px 0; }")
     lines.append(".info { background:#eef7ff; border-left:4px solid #3399ff; padding:6px; margin:4px 0; }")
+    lines.append(".risk-low { background:#e8f5e9; border-left:4px solid #2e7d32; padding:6px; margin:4px 0; }")
+    lines.append(".risk-moderate { background:#fff8d6; border-left:4px solid #e6b800; padding:6px; margin:4px 0; }")
+    lines.append(".risk-high { background:#ffe6e6; border-left:4px solid #cc0000; padding:6px; margin:4px 0; }")
     lines.append(".summary { background:#f5f5f5; padding:12px; margin:12px 0; border-radius:6px; }")
     lines.append(".summary div { margin:4px 0; }")
     lines.append(".line { font-family:monospace; }")
@@ -462,7 +465,7 @@ def build_summary_section(lines, latex_lines, warnings, severity_counts):
     html_lines.append("<div><strong>Diagnostic Summary:</strong></div>")
     html_lines.append("<div>Confidence: 80.0</div>")
     html_lines.append("<div>Predictive Risk: 20.0</div>")
-    html_lines.append("<div>Risk Level: LOW</div>")
+    html_lines.append('<div class="risk-low"><strong>Risk Level:</strong> LOW</div>')
 
     if severity_counts:
         html_lines.append("<div><strong>Severity:</strong></div>")
