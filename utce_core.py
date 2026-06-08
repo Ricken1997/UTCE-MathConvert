@@ -466,26 +466,49 @@ def build_summary_section(lines, latex_lines, warnings, severity_counts):
     html_lines.append("<div><strong>Diagnostic Summary:</strong></div>")
     html_lines.append("<div>Confidence: 80.0</div>")
     html_lines.append("<div>Predictive Risk: 20.0</div>")
-    
-    diagnosis = StructuralDiagnosis()
-    risk_level = diagnosis.risk_level()
 
-    if risk_level == "MINIMAL":
-        risk_class = "risk-low"
-    elif risk_level == "LOW":
-        risk_class = "risk-low"
-    elif risk_level == "MODERATE":
-        risk_class = "risk-moderate"
-    elif risk_level == "HIGH":
-        risk_class = "risk-high"
-    else:
-        risk_class = "risk-high"
+error_count = severity_counts.get("ERROR", 0)
+warning_count = severity_counts.get("WARNING", 0)
+info_count = severity_counts.get("INFO", 0)
 
-    html_lines.append(
+risk_load = (error_count * 15) + (warning_count * 8) + (info_count * 3)
+risk_load = min(100, risk_load)
+
+stability_score = max(0, 100 - risk_load)
+
+html_lines.append(f"<div>DEBUG error_count: {error_count}</div>")
+html_lines.append(f"<div>DEBUG risk_load: {risk_load}</div>")
+html_lines.append(f"<div>DEBUG stability_score: {stability_score}</div>")
+
+diagnosis = StructuralDiagnosis(
+    observer_clarity=stability_score,
+    theory_fit=stability_score,
+    reality_compatibility=stability_score,
+    target_coherence=stability_score,
+    temporal_stability=stability_score,
+    residual_risk=risk_load,
+    meta_diagnostic_risk=risk_load,
+    cross_application_validation=stability_score,
+)
+
+risk_level = diagnosis.risk_level()
+
+if risk_level == "MINIMAL":
+    risk_class = "risk-low"
+elif risk_level == "LOW":
+    risk_class = "risk-low"
+elif risk_level == "MODERATE":
+    risk_class = "risk-moderate"
+elif risk_level == "HIGH":
+    risk_class = "risk-high"
+else:
+    risk_class = "risk-high"
+
+html_lines.append(
     f'<div class="{risk_class}"><strong>Risk Level:</strong> {risk_level}</div>'
 )
 
-    html_lines.append(
+html_lines.append(
     f'<div class="recommendation"><strong>Recommendation:</strong> {diagnosis.recommendation()}</div>'
 )
 
