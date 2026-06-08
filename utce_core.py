@@ -466,8 +466,28 @@ def build_summary_section(lines, latex_lines, warnings, severity_counts):
     html_lines.append("<div><strong>Diagnostic Summary:</strong></div>")
     html_lines.append("<div>Confidence: 80.0</div>")
     html_lines.append("<div>Predictive Risk: 20.0</div>")
-    html_lines.append('<div class="risk-low"><strong>Risk Level:</strong> LOW</div>')
-    html_lines.append('<div class="recommendation"><strong>Recommendation:</strong> Output is mostly stable, but minor review is recommended.</div>')
+    
+    diagnosis = StructuralDiagnosis()
+    risk_level = diagnosis.risk_level()
+
+    if risk_level == "MINIMAL":
+        risk_class = "risk-low"
+    elif risk_level == "LOW":
+        risk_class = "risk-low"
+    elif risk_level == "MODERATE":
+        risk_class = "risk-moderate"
+    elif risk_level == "HIGH":
+        risk_class = "risk-high"
+    else:
+        risk_class = "risk-high"
+
+    html_lines.append(
+    f'<div class="{risk_class}"><strong>Risk Level:</strong> {risk_level}</div>'
+)
+
+    html_lines.append(
+    f'<div class="recommendation"><strong>Recommendation:</strong> {diagnosis.recommendation()}</div>'
+)
 
     if severity_counts:
         html_lines.append("<div><strong>Severity:</strong></div>")
