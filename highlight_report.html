@@ -4,20 +4,24 @@
 <meta charset="utf-8">
 <title>UTCE MathConvert Highlight Report</title>
 <style>
-body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin: 24px; }
-h1 { font-size: 24px; }
-.ok { background: #e8f5e9; padding: 6px; margin: 4px 0; }
-.warn { background: #fff3cd; padding: 6px; margin: 4px 0; border-left: 4px solid #ff9800; }
+body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin:24px; }
+h1 { font-size:24px; }
+.ok { background:#e8f5e9; padding:6px; margin:4px 0; }
 .error { background:#ffe6e6; border-left:4px solid #cc0000; padding:6px; margin:4px 0; }
 .warning { background:#fff8d6; border-left:4px solid #e6b800; padding:6px; margin:4px 0; }
 .info { background:#eef7ff; border-left:4px solid #3399ff; padding:6px; margin:4px 0; }
-.summary { background: #f5f5f5; padding: 12px; margin: 12px 0; border-radius: 6px; }
-.summary div { margin: 4px 0; }
-.line { font-family: monospace; }
-.latex { color: #333; font-family: monospace; }
-.lineno { color: #777; display: inline-block; width: 48px; }
-.suggestion { margin-top: 6px; padding: 6px; background: #eef7ff; border-left: 4px solid #2196f3; font-family: monospace; }
-.suggestion-label { font-weight: bold; }
+.risk-low { background:#e8f5e9; border-left:4px solid #2e7d32; padding:6px; margin:4px 0; }
+.risk-moderate { background:#fff8d6; border-left:4px solid #e6b800; padding:6px; margin:4px 0; }
+.risk-high { background:#ffe6e6; border-left:4px solid #cc0000; padding:6px; margin:4px 0; }
+.recommendation { background:#f5f5f5; border-left:4px solid #555; padding:6px; margin:4px 0; }
+.summary { background:#f5f5f5; padding:12px; margin:12px 0; border-radius:6px; }
+.summary div { margin:4px 0; }
+.line { font-family:monospace; }
+.latex { color:#333; font-family:monospace; }
+.lineno { color:#777; display:inline-block; width:48px; }
+.suggestion { margin-top:6px; padding:6px; background:#eef7ff; border-left:4px solid #3399ff; }
+.suggestion-label { font-weight:bold; }
+button { margin-right:4px; padding:3px 8px; }
 </style>
 </head>
 <body>
@@ -27,6 +31,11 @@ h1 { font-size: 24px; }
 <div>Input Lines: 38</div>
 <div>Output Lines: 38</div>
 <div>Warnings: 5</div>
+<div><strong>Diagnostic Summary:</strong></div>
+<div>Confidence: 25.0</div>
+<div>Predictive Risk: 75.0</div>
+<div class="risk-high"><strong>Risk Level:</strong> HIGH</div>
+<div class="recommendation"><strong>Recommendation:</strong> Review warning source and apply suggested fixes before reuse.</div>
 <div><strong>Severity:</strong></div>
 <div>ERROR: 5</div>
 <div><strong>Warning Types:</strong></div>
@@ -37,115 +46,87 @@ h1 { font-size: 24px; }
 <div>matrix: 1</div>
 </div>
 <h2>Warnings</h2>
-
 <div style="margin:12px 0;">
 <button data-filter="all">All</button>
 <button data-filter="error">Error</button>
 <button data-filter="warning">Warning</button>
 <button data-filter="info">Info</button>
 </div>
-
 <div style="margin:8px 0 12px 0;">
-<input id="warningSearch"
-       type="text"
-       placeholder="Search warnings..."
-       style="padding:4px; width:240px;">
+<input id="warningSearch" type="text" placeholder="Search warnings..." style="padding:6px; width:240px;">
 </div>
-
-<div class="error" data-severity="error"><span class="lineno">1</span><a href="#line-34">[ERROR] Line 34: Warning: frac requires 2 arguments, got 1: frac(1)</a></div>
+<div class="error" data-severity="error"><span class="lineno">1</span> [ERROR] Line 34: Warning: frac requires 2 arguments, got 1: frac(1)</div>
 <div class="suggestion"><span class="suggestion-label">Suggested Fix:</span> frac(numerator, denominator)</div>
-</div>
-<div class="error" data-severity="error"><span class="lineno">2</span><a href="#line-35">[ERROR] Line 35: Warning: sum requires 4 arguments, got 2: sum(1,2)</a></div>
+<div class="error" data-severity="error"><span class="lineno">2</span> [ERROR] Line 35: Warning: sum requires 4 arguments, got 2: sum(1,2)</div>
 <div class="suggestion"><span class="suggestion-label">Suggested Fix:</span> sum(index, start, end, expression)</div>
-</div>
-<div class="error" data-severity="error"><span class="lineno">3</span><a href="#line-36">[ERROR] Line 36: Warning: int requires 4 arguments, got 3: int(0,1,x)</a></div>
+<div class="error" data-severity="error"><span class="lineno">3</span> [ERROR] Line 36: Warning: int requires 4 arguments, got 3: int(0,1,x)</div>
 <div class="suggestion"><span class="suggestion-label">Suggested Fix:</span> int(start, end, expression, variable)</div>
-</div>
-<div class="error" data-severity="error"><span class="lineno">4</span><a href="#line-37">[ERROR] Line 37: Warning: lim requires 3 arguments, got 2: lim(x,0)</a></div>
+<div class="error" data-severity="error"><span class="lineno">4</span> [ERROR] Line 37: Warning: lim requires 3 arguments, got 2: lim(x,0)</div>
 <div class="suggestion"><span class="suggestion-label">Suggested Fix:</span> lim(variable, target, expression)</div>
-</div>
-<div class="error" data-severity="error"><span class="lineno">5</span><a href="#line-38">[ERROR] Line 38: Warning: matrix requires at least 2 rows separated by &#x27;;&#x27;: matrix(a,b,c)</a></div>
+<div class="error" data-severity="error"><span class="lineno">5</span> [ERROR] Line 38: Warning: matrix requires at least 2 rows separated by &#x27;;&#x27;: matrix(a,b,c)</div>
 <div class="suggestion"><span class="suggestion-label">Suggested Fix:</span> matrix(a,b;c,d)</div>
-</div>
 <h2>LaTeX Output</h2>
-<div class="line latex" id="line-1"><span class="lineno">1</span>$\frac{1}{2} + \sqrt{x^{2}}$</div>
-<div class="line latex" id="line-2"><span class="lineno">2</span>$\sum_{i=1}^{n} x^{i}$</div>
-<div class="line latex" id="line-3"><span class="lineno">3</span>$\int_{0}^{1} x^{2} \, dx$</div>
-<div class="line latex" id="line-4"><span class="lineno">4</span>$\sin(\theta) + \cos(\alpha)$</div>
-<div class="line latex" id="line-5"><span class="lineno">5</span>$\log(x) + \beta^{2}$</div>
-<div class="line latex" id="line-6"><span class="lineno">6</span>$\tan(\theta)$</div>
-<div class="line latex" id="line-7"><span class="lineno">7</span>$\ln(x)$</div>
-<div class="line latex" id="line-8"><span class="lineno">8</span>$e^{x}$</div>
-<div class="line latex" id="line-9"><span class="lineno">9</span>$\pi \cdot  r^{2}$</div>
-<div class="line latex" id="line-10"><span class="lineno">10</span>$\lim_{x \to 0} \sin(x/x)$</div>
-<div class="line latex" id="line-11"><span class="lineno">11</span>$\frac{\partial f}{\partial x}$</div>
-<div class="line latex" id="line-12"><span class="lineno">12</span>$\left|x-1\right|$</div>
-<div class="line latex" id="line-13"><span class="lineno">13</span>$\left\|v\right\|$</div>
-<div class="line latex" id="line-14"><span class="lineno">14</span>$x \le  y$</div>
-<div class="line latex" id="line-15"><span class="lineno">15</span>$a \ge  b$</div>
-<div class="line latex" id="line-16"><span class="lineno">16</span>$x \ne  0$</div>
-<div class="line latex" id="line-17"><span class="lineno">17</span>$A \to  B$</div>
-<div class="line latex" id="line-18"><span class="lineno">18</span>$P &lt;\to  Q$</div>
-<div class="line latex" id="line-19"><span class="lineno">19</span>$\vec{v}$</div>
-<div class="line latex" id="line-20"><span class="lineno">20</span>$\hat{x}$</div>
-<div class="line latex" id="line-21"><span class="lineno">21</span>$\bar{y}$</div>
-<div class="line latex" id="line-22"><span class="lineno">22</span>$\max(a,b)$</div>
-<div class="line latex" id="line-23"><span class="lineno">23</span>$\min(x,y)$</div>
-<div class="line latex" id="line-24"><span class="lineno">24</span>$\begin{cases} x&gt;0,x^{2} \\  x&lt;0,-x \end{cases}$</div>
-<div class="line latex" id="line-25"><span class="lineno">25</span>$\begin{bmatrix} a &amp; b \\ c &amp; d \end{bmatrix}$</div>
-<div class="line latex" id="line-26"><span class="lineno">26</span>$a \cdot b$</div>
-<div class="line latex" id="line-27"><span class="lineno">27</span>$u \times v$</div>
-<div class="line latex" id="line-28"><span class="lineno">28</span>$\det(A)$</div>
-<div class="line latex" id="line-29"><span class="lineno">29</span>$\left\lfloor x/2 \right\rfloor$</div>
-<div class="line latex" id="line-30"><span class="lineno">30</span>$\left\lceil n/3 \right\rceil$</div>
-<div class="line latex" id="line-31"><span class="lineno">31</span>$\mu + \phi$</div>
-<div class="line latex" id="line-32"><span class="lineno">32</span>$x_{1} + a_{n}$</div>
-<div class="line latex" id="line-33"><span class="lineno">33</span>$y_{n+1}$</div>
-<div class="line latex" id="line-34"><span class="lineno">34</span>$frac(1)$</div>
-<div class="line latex" id="line-35"><span class="lineno">35</span>$sum(1,2)$</div>
-<div class="line latex" id="line-36"><span class="lineno">36</span>$int(0,1,x)$</div>
-<div class="line latex" id="line-37"><span class="lineno">37</span>$lim(x,0)$</div>
-<div class="line latex" id="line-38"><span class="lineno">38</span>$matrix(a,b,c)$</div>
-
+<pre class="latex">
+$frac(1,2) + sqrt(x^{2})$
+$sum(i,1,n,x^{i})$
+$int(0,1,x^{2},x)$
+$sin(theta) + cos(alpha)$
+$log(x) + beta^{2}$
+$tan(theta)$
+$ln(x)$
+$exp(x)$
+$\\\\\\\\\\\\\pi \cdot  r^{2}$
+$lim(x,0,sin(x)/x)$
+$partial(f,x)$
+$abs(x-1)$
+$norm(v)$
+$x \le  y$
+$a \ge  b$
+$x \ne  0$
+$A \to  B$
+$P \leftrightarrow  Q$
+$vec(v)$
+$hat(x)$
+$bar(y)$
+$max(a,b)$
+$min(x,y)$
+$cases(x&gt;0,x^{2}; x&lt;0,-x)$
+$matrix(a,b;c,d)$
+$dot(a,b)$
+$cross(u,v)$
+$det(A)$
+$floor(x/2)$
+$ceil(n/3)$
+$mu + phi$
+$x_{1} + a_{n}$
+$y_(n+1)$
+$frac(1)$
+$sum(1,2)$
+$int(0,1,x)$
+$lim(x,0)$
+$matrix(a,b,c)$
+</pre>
 <script>
-function applyFilters() {
-    const keywordInput = document.getElementById("warningSearch");
-    const keyword = keywordInput ? keywordInput.value.toLowerCase() : "";
-    const active = window.currentSeverity || "all";
-
-    document.querySelectorAll("[data-severity]").forEach(function (el) {
-        const severity = el.getAttribute("data-severity");
-        const text = (
-            el.textContent + " " +
-            el.getAttribute("data-severity") + " " +
-            el.className
-        ).toLowerCase();
-
-        const severityMatch = active === "all" || severity === active;
-        const keywordMatch = keyword === "" || text.includes(keyword);
-
-        const show = severityMatch && keywordMatch;
-        el.style.display = show ? "" : "none";
-
-        const next = el.nextElementSibling;
-        if (next && next.classList.contains("suggestion")) {
-            next.style.display = show ? "" : "none";
-        }
-    });
+const buttons = document.querySelectorAll('button[data-filter]');
+const search = document.getElementById('warningSearch');
+function applyFilters(){
+  const active = document.querySelector('button.active');
+  const filter = active ? active.dataset.filter : 'all';
+  const q = search ? search.value.toLowerCase() : '';
+  document.querySelectorAll('[data-severity]').forEach(el => {
+    const sev = el.dataset.severity;
+    const text = el.textContent.toLowerCase();
+    const showByFilter = filter === 'all' || sev === filter;
+    const showBySearch = !q || text.includes(q);
+    el.style.display = (showByFilter && showBySearch) ? '' : 'none';
+  });
 }
-
-document.querySelectorAll("button[data-filter]").forEach(function (button) {
-    button.addEventListener("click", function () {
-        window.currentSeverity = button.getAttribute("data-filter");
-        applyFilters();
-    });
-});
-
-const searchInput = document.getElementById("warningSearch");
-if (searchInput) {
-    searchInput.addEventListener("input", applyFilters);
-}
+buttons.forEach(btn => btn.addEventListener('click', () => {
+  buttons.forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  applyFilters();
+}));
+if (search) search.addEventListener('input', applyFilters);
 </script>
-
 </body>
 </html>
