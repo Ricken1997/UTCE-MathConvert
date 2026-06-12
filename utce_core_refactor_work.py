@@ -272,6 +272,10 @@ def create_warning_info(line_number: int, warning: str, text: str) -> WarningInf
 def plain_to_latex(text: str) -> str:
     expr = text.strip()
 
+    if not expr:
+        return ""
+
+    # Greek letters
     greek = {
         "alpha": r"\alpha",
         "beta": r"\beta",
@@ -285,32 +289,75 @@ def plain_to_latex(text: str) -> str:
         "sigma": r"\sigma",
         "phi": r"\phi",
         "omega": r"\omega",
+        "pi": r"\pi",
     }
 
     for plain, latex in greek.items():
-        expr = re.sub(
-            r"\bpi\b",
-            lambda m: r"\pi",
-            expr
-        )
+        expr = expr.replace(plain, latex)
 
-    expr = re.sub(
-    r"\bpi\b",
-    lambda m: r"\pi",
-    expr
-)
-    expr = expr.replace("<=", r"\le ")
-    expr = expr.replace(">=", r"\ge ")
-    expr = expr.replace("!=", r"\ne ")
-    expr = expr.replace("<->", r"\leftrightarrow ")
-    expr = expr.replace("->", r"\to ")
-    expr = expr.replace("*", r"\cdot ")
+    # frac(a,b) -> \frac{a}{b}
+    if expr.startswith("frac(") and expr.endswith(")"):
+        inside = expr[5:-1]
+        parts = [p.strip() for p in inside.split(",")]
+        if len(parts) == 2:
+            return rf"$\frac{{{parts[0]}}}{{{parts[1]}}}$"
 
-    expr = re.sub(r"([A-Za-z])_([0-9A-Za-z]+)", r"\1_{\2}", expr)
-    expr = re.sub(r"([A-Za-z])\^([0-9A-Za-z]+)", r"\1^{\2}", expr)
+    # sum(i,1,n,i^2) -> \sum_{i=1}^{n} i^{2}
+    if expr.startswith("sum(") and expr.endswith(")"):
+        inside = expr[4:-1]
+        parts = [p.strip() for p in inside.split(",")]
+        if len(parts) == 4:
+            index, start, end, body = parts
+            body = plain_to_latex_inner(body)
+            return rf"$\sum_{{{index}={start}}}^{{{end}}} {body}$"
+
+    # int(0,1,x) -> \int_{0}^{1} x
+    if expr.startswith("int(") and expr.endswith(")"):
+        inside = expr[4:-1]
+        parts = [p.strip() for p in inside.split(",")]
+        if len(parts) == 3:
+            start, end, body = parts
+            body = plain_to_latex_inner(body)
+            return rf"$\int_{{{start}}}^{{{end}}} {body}$"
+
+    # lim(x,0) -> \lim_{x \to 0}
+    if expr.startswith("lim(") and expr.endswith(")"):
+        inside = expr[4:-1]
+        parts = [p.strip() for p in inside.split(",")]
+        if len(parts) == 2:
+            variable, target = parts
+            return rf"$\lim_{{{variable} \to {target}}}$"
+
+    # powers: x^2 -> x^{2}
+    expr = re.sub(r"([A-Za-z0-9\\]+)\^([A-Za-z0-9]+)", r"\1^{\2}", expr)
 
     return f"${expr}$"
 
+def plain_to_latex_inner(expr: str) -> str:
+    expr = expr.strip()
+
+    greek = {
+        "alpha": r"\alpha",
+        "beta": r"\beta",
+        "gamma": r"\gamma",
+        "delta": r"\delta",
+        "theta": r"\theta",
+        "lambda": r"\lambda",
+        "mu": r"\mu",
+        "nu": r"\nu",
+        "rho": r"\rho",
+        "sigma": r"\sigma",
+        "phi": r"\phi",
+        "omega": r"\omega",
+        "pi": r"\pi",
+    }
+
+    for plain, latex in greek.items():
+        expr = expr.replace(plain, latex)
+
+    expr = re.sub(r"([A-Za-z0-9\\]+)\^([A-Za-z0-9]+)", r"\1^{\2}", expr)
+
+    return expr
 
 def build_latex_output(latex_lines: list[str], mode: str) -> str:
     if mode == "block":
