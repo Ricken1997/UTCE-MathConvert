@@ -300,17 +300,56 @@ def plain_to_latex(text: str) -> str:
     expr
 )
     expr = expr.replace("<=", r"\le ")
-    expr = expr.replace(">=", r"\ge ")
-    expr = expr.replace("!=", r"\ne ")
-    expr = expr.replace("<->", r"\leftrightarrow ")
-    expr = expr.replace("->", r"\to ")
-    expr = expr.replace("*", r"\cdot ")
+expr = expr.replace(">=", r"\ge ")
+expr = expr.replace("!=", r"\ne ")
+expr = expr.replace("<->", r"\leftrightarrow ")
+expr = expr.replace("->", r"\to ")
+expr = expr.replace("*", r"\cdot ")
 
-    expr = re.sub(r"([A-Za-z])_([0-9A-Za-z]+)", r"\1_{\2}", expr)
-    expr = re.sub(r"([A-Za-z])\^([0-9A-Za-z]+)", r"\1^{\2}", expr)
+# ===== 初等関数 =====
 
-    return f"${expr}$"
+expr = re.sub(
+    r"sqrt\((.*?)\)",
+    r"\\sqrt{\1}",
+    expr
+)
 
+expr = re.sub(
+    r"sin\((.*?)\)",
+    r"\\sin(\1)",
+    expr
+)
+
+expr = re.sub(
+    r"cos\((.*?)\)",
+    r"\\cos(\1)",
+    expr
+)
+
+expr = re.sub(
+    r"tan\((.*?)\)",
+    r"\\tan(\1)",
+    expr
+)
+
+expr = re.sub(
+    r"log\((.*?)\)",
+    r"\\log(\1)",
+    expr
+)
+
+expr = re.sub(
+    r"ln\((.*?)\)",
+    r"\\ln(\1)",
+    expr
+)
+
+# ===== 添字・指数 =====
+
+expr = re.sub(r"([A-Za-z])_([0-9A-Za-z]+)", r"\1_{\2}", expr)
+expr = re.sub(r"([A-Za-z])\^([0-9A-Za-z]+)", r"\1^{\2}", expr)
+
+return f"${expr}$"
 
 def build_latex_output(latex_lines: list[str], mode: str) -> str:
     if mode == "block":

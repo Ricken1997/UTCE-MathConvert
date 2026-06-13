@@ -275,63 +275,16 @@ def plain_to_latex(text: str) -> str:
     if not expr:
         return ""
 
-    # Greek letters
-    greek = {
-        "alpha": r"\alpha",
-        "beta": r"\beta",
-        "gamma": r"\gamma",
-        "delta": r"\delta",
-        "theta": r"\theta",
-        "lambda": r"\lambda",
-        "mu": r"\mu",
-        "nu": r"\nu",
-        "rho": r"\rho",
-        "sigma": r"\sigma",
-        "phi": r"\phi",
-        "omega": r"\omega",
-        "pi": r"\pi",
-    }
+    # Main structural commands
+    result = convert_structural_expression(expr)
 
-    for plain, latex in greek.items():
-        expr = expr.replace(plain, latex)
+    if result is not None:
+        return f"${result}$"
 
-    # frac(a,b) -> \frac{a}{b}
-    if expr.startswith("frac(") and expr.endswith(")"):
-        inside = expr[5:-1]
-        parts = [p.strip() for p in inside.split(",")]
-        if len(parts) == 2:
-            return rf"$\frac{{{parts[0]}}}{{{parts[1]}}}$"
-
-    # sum(i,1,n,i^2) -> \sum_{i=1}^{n} i^{2}
-    if expr.startswith("sum(") and expr.endswith(")"):
-        inside = expr[4:-1]
-        parts = [p.strip() for p in inside.split(",")]
-        if len(parts) == 4:
-            index, start, end, body = parts
-            body = plain_to_latex_inner(body)
-            return rf"$\sum_{{{index}={start}}}^{{{end}}} {body}$"
-
-    # int(0,1,x) -> \int_{0}^{1} x
-    if expr.startswith("int(") and expr.endswith(")"):
-        inside = expr[4:-1]
-        parts = [p.strip() for p in inside.split(",")]
-        if len(parts) == 3:
-            start, end, body = parts
-            body = plain_to_latex_inner(body)
-            return rf"$\int_{{{start}}}^{{{end}}} {body}$"
-
-    # lim(x,0) -> \lim_{x \to 0}
-    if expr.startswith("lim(") and expr.endswith(")"):
-        inside = expr[4:-1]
-        parts = [p.strip() for p in inside.split(",")]
-        if len(parts) == 2:
-            variable, target = parts
-            return rf"$\lim_{{{variable} \to {target}}}$"
-
-    # powers: x^2 -> x^{2}
-    expr = re.sub(r"([A-Za-z0-9\\]+)\^([A-Za-z0-9]+)", r"\1^{\2}", expr)
+    expr = plain_to_latex_inner(expr)
 
     return f"${expr}$"
+
 
 def plain_to_latex_inner(expr: str) -> str:
     expr = expr.strip()
@@ -355,9 +308,168 @@ def plain_to_latex_inner(expr: str) -> str:
     for plain, latex in greek.items():
         expr = expr.replace(plain, latex)
 
+    expr = expr.replace("<=", r"\le ")
+    expr = expr.replace(">=", r"\ge ")
+    expr = expr.replace("!=", r"\ne ")
+    expr = expr.replace("<->", r"\leftrightarrow ")
+    expr = expr.replace("->", r"\to ")
+    expr = expr.replace("*", r"\cdot ")
+
+    expr = re.sub(r"sqrt\((.*?)\)", r"\\sqrt{\1}", expr)
+    expr = re.sub(r"sin\((.*?)\)", r"\\sin(\1)", expr)
+    expr = re.sub(r"cos\((.*?)\)", r"\\cos(\1)", expr)
+    expr = re.sub(r"tan\((.*?)\)", r"\\tan(\1)", expr)
+    expr = re.sub(r"log\((.*?)\)", r"\\log(\1)", expr)
+    expr = re.sub(r"ln\((.*?)\)", r"\\ln(\1)", expr)
+
+    expr = re.sub(r"([A-Za-z0-9\\]+)_([A-Za-z0-9]+)", r"\1_{\2}", expr)
     expr = re.sub(r"([A-Za-z0-9\\]+)\^([A-Za-z0-9]+)", r"\1^{\2}", expr)
 
     return expr
+
+
+def convert_structural_expression(expr: str) -> str | None:
+    expr = expr.strip()
+
+    if expr.startswith("frac(") and expr.endswith(")"):
+        parts = split_args(expr[5:-1])
+        if len(parts) == 2:
+            return rf"\frac{{{plain_to_latex_inner(parts[0])}}}{{{plain_to_latex_inner(parts[1])}}}"
+
+    if expr.startswith("sum(") and expr.endswith(")"):
+        parts = split_args(expr[4:-1])
+        if len(parts) == 4:
+            index, start, end, body = parts
+            return rf"\sum_{{{index}={start}}}^{{{end}}} {plain_to_latex_inner(body)}"
+
+    if expr.startswith("prod(") and expr.endswith(")"):
+        parts = split_args(expr[5:-1])
+        if len(parts) == 4:
+            index, start, end, body = parts
+            return rf"\prod_{{{index}={start}}}^{{{end}}} {plain_to_latex_inner(body)}"
+
+    if expr.startswith("int(") and expr.endswith(")"):
+        parts = split_args(expr[4:-1])
+        if len(parts) == 3:
+            start, end, body = parts
+            return rf"\int_{{{start}}}^{{{end}}} {plain_to_latex_inner(body)}"
+
+    if expr.startswith("lim(") and expr.endswith(")"):
+        parts = split_args(expr[4:-1])
+        if len(parts) == 2:
+            variable, target = parts
+            return rf"\lim_{{{variable} \to {target}}}"
+
+    if expr.startswith("matrix(") and expr.endswith(")"):
+        rows = expr[7:-1].split(";")
+        matrix_rows = []
+        for row in rows:
+            cols = [plain_to_latex_inner(c.strip()) for c in row.split(",")]
+            matrix_rows.append(" & ".join(cols))
+        return r"\begin{bmatrix}" + r" \\ ".join(matrix_rows) + r"\end{bmatrix}"
+
+    if expr.startswith("vec(") and expr.endswith(")"):
+        items = [plain_to_latex_inner(x.strip()) for x in expr[4:-1].split(",")]
+        return r"\begin{pmatrix}" + r" \\ ".join(items) + r"\end{pmatrix}"
+
+    if expr.startswith("det(") and expr.endswith(")"):
+        rows = expr[4:-1].split(";")
+        det_rows = []
+        for row in rows:
+            cols = [plain_to_latex_inner(c.strip()) for c in row.split(",")]
+            det_rows.append(" & ".join(cols))
+        return r"\begin{vmatrix}" + r" \\ ".join(det_rows) + r"\end{vmatrix}"
+
+    if expr.startswith("cases(") and expr.endswith(")"):
+        rows = expr[6:-1].split(";")
+        case_rows = []
+        for row in rows:
+            parts = split_args(row)
+            if len(parts) == 2:
+                value, condition = parts
+                case_rows.append(
+                    f"{plain_to_latex_inner(value)} & {plain_to_latex_inner(condition)}"
+                )
+        return r"\begin{cases}" + r" \\ ".join(case_rows) + r"\end{cases}"
+
+    if expr.startswith("abs(") and expr.endswith(")"):
+        inside = plain_to_latex_inner(expr[4:-1])
+        return rf"\left|{inside}\right|"
+
+    if expr.startswith("norm(") and expr.endswith(")"):
+        inside = plain_to_latex_inner(expr[5:-1])
+        return rf"\left\|{inside}\right\|"
+
+    if expr.startswith("diff(") and expr.endswith(")"):
+        parts = split_args(expr[5:-1])
+        if len(parts) == 2:
+            expression, variable = parts
+            return rf"\frac{{d}}{{d{variable}}}{plain_to_latex_inner(expression)}"
+
+    if expr.startswith("pdiff(") and expr.endswith(")"):
+        parts = split_args(expr[6:-1])
+        if len(parts) == 2:
+            expression, variable = parts
+            return rf"\frac{{\partial {plain_to_latex_inner(expression)}}}{{\partial {variable}}}"
+
+    if expr.startswith("exp(") and expr.endswith(")"):
+        inside = plain_to_latex_inner(expr[4:-1])
+        return rf"e^{{{inside}}}"
+
+    if expr.startswith("factorial(") and expr.endswith(")"):
+        inside = plain_to_latex_inner(expr[10:-1])
+        return rf"{inside}!"
+
+    if expr.startswith("binom(") and expr.endswith(")"):
+        parts = split_args(expr[6:-1])
+        if len(parts) == 2:
+            n, r = parts
+            return rf"\binom{{{plain_to_latex_inner(n)}}}{{{plain_to_latex_inner(r)}}}"
+
+    if expr.startswith("union(") and expr.endswith(")"):
+        parts = split_args(expr[6:-1])
+        if len(parts) == 2:
+            return rf"{parts[0]} \cup {parts[1]}"
+
+    if expr.startswith("inter(") and expr.endswith(")"):
+        parts = split_args(expr[6:-1])
+        if len(parts) == 2:
+            return rf"{parts[0]} \cap {parts[1]}"
+
+    if expr.startswith("subset(") and expr.endswith(")"):
+        parts = split_args(expr[7:-1])
+        if len(parts) == 2:
+            return rf"{parts[0]} \subset {parts[1]}"
+
+    if expr.startswith("in(") and expr.endswith(")"):
+        parts = split_args(expr[3:-1])
+        if len(parts) == 2:
+            return rf"{parts[0]} \in {parts[1]}"
+
+    if expr.startswith("notin(") and expr.endswith(")"):
+        parts = split_args(expr[6:-1])
+        if len(parts) == 2:
+            return rf"{parts[0]} \notin {parts[1]}"
+
+    if expr.startswith("forall(") and expr.endswith(")"):
+        parts = split_args(expr[7:-1], maxsplit=1)
+        if len(parts) == 2:
+            variable, statement = parts
+            return rf"\forall {variable}\, {plain_to_latex_inner(statement)}"
+
+    if expr.startswith("exists(") and expr.endswith(")"):
+        parts = split_args(expr[7:-1], maxsplit=1)
+        if len(parts) == 2:
+            variable, statement = parts
+            return rf"\exists {variable}\, {plain_to_latex_inner(statement)}"
+
+    return None
+
+
+def split_args(text: str, maxsplit: int = -1) -> list[str]:
+    if maxsplit == -1:
+        return [p.strip() for p in text.split(",")]
+    return [p.strip() for p in text.split(",", maxsplit)]
 
 def build_latex_output(latex_lines: list[str], mode: str) -> str:
     if mode == "block":
