@@ -94,6 +94,17 @@ def copy_output():
         "Output copied to clipboard."
     )
 
+def insert_example_input():
+    example_text = """frac(1,2)
+sum(i,1,n,i^2)
+prod(i,1,n,a_i)
+matrix(1,2;3,4)
+cases(x^2,x>0;0,x<=0)
+union(A,B)
+forall(x,P(x))"""
+
+    input_box.delete("1.0", tk.END)
+    input_box.insert(tk.END, example_text)
 
 def open_text_file():
     file_path = filedialog.askopenfilename(
@@ -153,6 +164,9 @@ convert_button.pack(side="left", padx=(0, 8))
 
 open_button = ttk.Button(control_frame, text="Open Text File", command=open_text_file)
 open_button.pack(side="left", padx=(0, 8))
+
+example_button = ttk.Button(control_frame, text="Example Input", command=insert_example_input)
+example_button.pack(side="left", padx=(0, 8))
 
 save_button = ttk.Button(control_frame, text="Save Output", command=save_output)
 save_button.pack(side="left", padx=(0, 8))
