@@ -75,6 +75,26 @@ def save_output():
     messagebox.showinfo("Saved", f"Output saved successfully:\n{file_path}")
 
 
+def copy_output():
+    output_text = output_box.get("1.0", tk.END).strip()
+
+    if not output_text:
+        messagebox.showwarning(
+            "No output",
+            "There is no converted output to copy."
+        )
+        return
+
+    root.clipboard_clear()
+    root.clipboard_append(output_text)
+    root.update()
+
+    messagebox.showinfo(
+        "Copied",
+        "Output copied to clipboard."
+    )
+
+
 def open_text_file():
     file_path = filedialog.askopenfilename(
         title="Open Text File",
@@ -136,6 +156,9 @@ open_button.pack(side="left", padx=(0, 8))
 
 save_button = ttk.Button(control_frame, text="Save Output", command=save_output)
 save_button.pack(side="left", padx=(0, 8))
+
+copy_button = ttk.Button(control_frame, text="Copy Output", command=copy_output)
+copy_button.pack(side="left", padx=(0, 8))
 
 clear_button = ttk.Button(control_frame, text="Clear", command=clear_all)
 clear_button.pack(side="left", padx=(0, 8))
