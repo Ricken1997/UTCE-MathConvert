@@ -26,10 +26,22 @@ def convert_text():
 
     mathml_lines = []
 
+    omml_lines = []
+
     for line in latex_lines:
-        mathml_lines.append(
-            "<math><mtext>" + line + "</mtext></math>"
+        mathml = "<math><mtext>" + line + "</mtext></math>"
+        mathml_lines.append(mathml)
+
+        omml = (
+            "<m:oMathPara>"
+            "<m:oMath>"
+            "<m:r>"
+            "<m:t>" + line + "</m:t>"
+            "</m:r>"
+            "</m:oMath>"
+            "</m:oMathPara>"
         )
+        omml_lines.append(omml)
 
     print(mathml_lines)
 
@@ -41,6 +53,9 @@ def convert_text():
 
     mathml_box.delete("1.0", tk.END)
     mathml_box.insert(tk.END,"\n".join(mathml_lines))
+
+    omml_box.delete("1.0", tk.END)
+    omml_box.insert(tk.END, "\n".join(omml_lines))
 
     if warnings:
         warning_box.config(text="\n".join(warnings))
@@ -252,6 +267,13 @@ mathml_label.pack(anchor="w")
 
 mathml_box = tk.Text(main_frame, height=8)
 mathml_box.pack(fill="both", expand=False, pady=(0,10))
+
+# OMML Output
+omml_label = ttk.Label(main_frame, text="OMML Output")
+omml_label.pack(anchor="w")
+
+omml_box = tk.Text(main_frame, height=8, wrap="word")
+omml_box.pack(fill="both", expand=False, pady=(0, 10))
 
 # Warnings
 warning_label = ttk.Label(main_frame, text="Warnings")
