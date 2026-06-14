@@ -23,11 +23,24 @@ def convert_text():
     lines = plain_text.splitlines()
 
     latex_lines, warnings, severity_counts = analyze_lines(lines)
+
+    mathml_lines = []
+
+    for line in latex_lines:
+        mathml_lines.append(
+            "<math><mtext>" + line + "</mtext></math>"
+        )
+
+    print(mathml_lines)
+
     latex_output = build_latex_output(latex_lines, output_mode_var.get())
     diagnosis = build_diagnosis_from_severity_counts(severity_counts)
 
     output_box.delete("1.0", tk.END)
     output_box.insert(tk.END, latex_output)
+
+    mathml_box.delete("1.0", tk.END)
+    mathml_box.insert(tk.END,"\n".join(mathml_lines))
 
     if warnings:
         warning_box.config(text="\n".join(warnings))
@@ -232,6 +245,13 @@ output_label.pack(anchor="w")
 
 output_box = tk.Text(main_frame, height=10, wrap="word")
 output_box.pack(fill="both", expand=False, pady=(0, 10))
+
+# MathML Output
+mathml_label = ttk.Label(main_frame, text="MathML Output")
+mathml_label.pack(anchor="w")
+
+mathml_box = tk.Text(main_frame, height=8)
+mathml_box.pack(fill="both", expand=False, pady=(0,10))
 
 # Warnings
 warning_label = ttk.Label(main_frame, text="Warnings")
