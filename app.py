@@ -94,6 +94,23 @@ def copy_output():
         "Output copied to clipboard."
     )
 
+def detect_file_type(file_path):
+    lower_path = file_path.lower()
+
+    if lower_path.endswith(".tex"):
+        return "LaTeX File (.tex)"
+
+    if lower_path.endswith(".txt"):
+        return "Plain Text File (.txt)"
+
+    if lower_path.endswith(".md"):
+        return "Markdown File (.md)"
+
+    if lower_path.endswith(".docx"):
+        return "Word Document (.docx) - not yet supported"
+
+    return "Unknown File Type"
+
 def insert_example_input():
     example_text = """frac(1,2)
 sum(i,1,n,i^2)
@@ -133,6 +150,9 @@ def open_text_file():
     input_box.delete("1.0", tk.END)
     input_box.insert(tk.END, text)
 
+    detected_type = detect_file_type(file_path)
+    file_type_var.set(f"Detected File Type: {detected_type}")
+
 
 root = tk.Tk()
 root.title(APP_TITLE)
@@ -147,6 +167,14 @@ title_label = ttk.Label(
     font=("Helvetica", 18, "bold"),
 )
 title_label.pack(anchor="w", pady=(0, 10))
+
+file_type_var = tk.StringVar(value="Detected File Type: None")
+
+file_type_label = ttk.Label(
+    main_frame,
+    textvariable=file_type_var
+)
+file_type_label.pack(anchor="w", pady=(0, 10))
 
 # Input
 input_label = ttk.Label(main_frame, text="Input")
