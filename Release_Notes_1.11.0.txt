@@ -1,0 +1,23 @@
+UTCE MathConvert v11.0
+
+New Features
+
+- MathML Output panel added
+- OMML Output panel added
+- Parallel LaTeX / MathML / OMML generation
+- GUI integration completed
+
+Pipeline
+
+Plain Text
+→ LaTeX
+→ MathML
+→ OMML
+
+Status
+
+Stable Beta
+
+Date
+
+2026-06-15
