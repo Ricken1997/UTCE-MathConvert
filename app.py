@@ -1,3 +1,4 @@
+from omml_converter import plain_to_omml
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
@@ -10,7 +11,7 @@ from utce_core_refactor_work import (
 )
 
 
-APP_TITLE = "UTCE MathConvert v8.0 Beta"
+APP_TITLE = "UTCE MathConvert v11.0 True OMML Beta"
 
 
 def convert_text():
@@ -22,26 +23,22 @@ def convert_text():
 
     lines = plain_text.splitlines()
 
+    input_lines = plain_text.splitlines()
+
     latex_lines, warnings, severity_counts = analyze_lines(lines)
 
     mathml_lines = []
-
     omml_lines = []
 
     for line in latex_lines:
-        mathml = "<math><mtext>" + line + "</mtext></math>"
-        mathml_lines.append(mathml)
-
-        omml = (
-            "<m:oMathPara>"
-            "<m:oMath>"
-            "<m:r>"
-            "<m:t>" + line + "</m:t>"
-            "</m:r>"
-            "</m:oMath>"
-            "</m:oMathPara>"
+        mathml_lines.append(
+            "<math><mtext>" + line + "</mtext></math>"
         )
-        omml_lines.append(omml)
+
+    for original_line in input_lines:
+        omml_lines.append(
+            plain_to_omml(original_line)
+        )
 
     print(mathml_lines)
 
