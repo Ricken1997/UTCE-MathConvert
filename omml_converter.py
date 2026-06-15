@@ -33,6 +33,38 @@ def omml_fraction(numerator: str, denominator: str) -> str:
     )
 
 
+def omml_superscript(base: str, sup: str) -> str:
+    base = escape_xml(base)
+    sup = escape_xml(sup)
+
+    return (
+        "<m:sSup>"
+        "<m:e>"
+        + omml_text(base)
+        + "</m:e>"
+        "<m:sup>"
+        + omml_text(sup)
+        + "</m:sup>"
+        "</m:sSup>"
+    )
+
+
+def omml_subscript(base: str, sub: str) -> str:
+    base = escape_xml(base)
+    sub = escape_xml(sub)
+
+    return (
+        "<m:sSub>"
+        "<m:e>"
+        + omml_text(base)
+        + "</m:e>"
+        "<m:sub>"
+        + omml_text(sub)
+        + "</m:sub>"
+        "</m:sSub>"
+    )
+
+
 def wrap_omml(math_body: str) -> str:
     return (
         "<m:oMathPara>"
@@ -54,6 +86,26 @@ def plain_to_omml(expr: str) -> str:
             numerator, denominator = parts
             return wrap_omml(
                 omml_fraction(numerator, denominator)
+            )
+
+        if expr.startswith("pow(") and expr.endswith(")"):
+            inside = expr[4:-1]
+            parts = [p.strip() for p in inside.split(",")]
+
+            if len(parts) == 2:
+                base, sup = parts
+                return wrap_omml(
+                    omml_superscript(base, sup)
+                )
+
+    if expr.startswith("sub(") and expr.endswith(")"):
+        inside = expr[4:-1]
+        parts = [p.strip() for p in inside.split(",")]
+
+        if len(parts) == 2:
+            base, sub = parts
+            return wrap_omml(
+                omml_subscript(base, sub)
             )
 
     return wrap_omml(
