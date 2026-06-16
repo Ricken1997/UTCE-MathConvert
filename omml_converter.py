@@ -49,6 +49,22 @@ def omml_superscript(base: str, sup: str) -> str:
     )
 
 
+def omml_sqrt(value: str) -> str:
+    value = escape_xml(value)
+
+    return (
+        "<m:rad>"
+        "<m:radPr>"
+        "<m:degHide m:val=\"1\"/>"
+        "</m:radPr>"
+        "<m:deg/>"
+        "<m:e>"
+        + omml_text(value)
+        + "</m:e>"
+        "</m:rad>"
+    )
+
+
 def omml_subscript(base: str, sub: str) -> str:
     base = escape_xml(base)
     sub = escape_xml(sub)
@@ -107,6 +123,12 @@ def plain_to_omml(expr: str) -> str:
             return wrap_omml(
                 omml_subscript(base, sub)
             )
+    
+    if expr.startswith("sqrt(") and expr.endswith(")"):
+        inside = expr[5:-1].strip()
+        return wrap_omml(
+            omml_sqrt(inside)
+        )
 
     return wrap_omml(
         omml_text(expr)
