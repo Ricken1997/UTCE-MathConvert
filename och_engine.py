@@ -116,6 +116,31 @@ def build_observer_views(
     return views
 
 
+def analyze_by_observer(text: str, observer: str) -> str:
+    result = analyze_och(text)
+
+    report = []
+    report.append(f"OCH Observer Mode: {observer}")
+    report.append("")
+
+    report.append(format_och_report(result))
+    report.append("")
+    report.append("Observer-Specific Focus")
+
+    if observer == "査読者":
+        report.append("- 未処理の前提、文献接続、過剰主張が残差として戻る可能性があります。")
+    elif observer == "教師":
+        report.append("- 誤答や反復ミスは、見落とされた条件や手順の General Zero として読めます。")
+    elif observer == "開発者":
+        report.append("- エラーや不具合は、処理系が前提としていた条件のゼロ化として読めます。")
+    elif observer == "AI":
+        report.append("- 応答不能や一般論化は、文脈・制約・安全性レイヤーの General Zero として読めます。")
+    else:
+        report.append("- 指定観測者に応じた General Zero と残差回帰を確認してください。")
+
+    return "\n".join(report)
+
+
 def build_retranslation_candidates(
     general_zero_candidates: List[str],
     residual_returns: List[str],
@@ -235,4 +260,4 @@ if __name__ == "__main__":
 """
 
     result = analyze_och(sample_text)
-    print(format_och_report(result))
+    print(analyze_by_observer(sample_text, "査読者"))
