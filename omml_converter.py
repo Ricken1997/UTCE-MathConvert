@@ -114,6 +114,16 @@ def plain_to_omml(expr: str) -> str:
                     omml_superscript(base, sup)
                 )
 
+    if expr.startswith("sup(") and expr.endswith(")"):
+        inside = expr[4:-1]
+        parts = [p.strip() for p in inside.split(",")]
+
+        if len(parts) == 2:
+            base, sup = parts
+            return wrap_omml(
+                omml_superscript(base, sup)
+            )
+
     if expr.startswith("sub(") and expr.endswith(")"):
         inside = expr[4:-1]
         parts = [p.strip() for p in inside.split(",")]
