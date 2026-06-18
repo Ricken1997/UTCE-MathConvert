@@ -164,6 +164,36 @@ def omml_integral(variable: str, lower: str, upper: str, body: str) -> str:
     )
 
 
+def omml_matrix(matrix_text: str) -> str:
+    rows = matrix_text.split(";")
+
+    row_xml = ""
+
+    for row in rows:
+        cells = [cell.strip() for cell in row.split(",")]
+
+        cell_xml = ""
+        for cell in cells:
+            cell_xml += (
+                "<m:e>"
+                + omml_text(cell)
+                + "</m:e>"
+            )
+
+        row_xml += (
+            "<m:mr>"
+            + cell_xml
+            + "</m:mr>"
+        )
+
+    return (
+        "<m:m>"
+        "<m:mPr/>"
+        + row_xml
+        + "</m:m>"
+    )
+
+
 def omml_subscript(base: str, sub: str) -> str:
     base = escape_xml(base)
     sub = escape_xml(sub)
@@ -193,13 +223,20 @@ def wrap_omml(math_body: str) -> str:
 def plain_to_omml(expr: str) -> str:
     expr = expr.strip()
 
+    # Remove inline/block LaTeX markers if they arrive here
+    if expr.startswith("$") and expr.endswith("$"):
+        expr = expr[1:-1].strip()
+
+    # Convert LaTeX command form: \alpha -> alpha
     if expr.startswith("\\"):
         expr = expr[1:]
 
+    # Greek symbol conversion
     if expr in GREEK_MAP:
         return wrap_omml(
             omml_text(GREEK_MAP[expr])
         )
+
 
     if expr.startswith("frac(") and expr.endswith(")"):
         inside = expr[5:-1]
@@ -276,6 +313,12 @@ def plain_to_omml(expr: str) -> str:
             return wrap_omml(
                 omml_integral(variable, lower, upper, body)
             )
+    
+    if expr.startswith("matrix(") and expr.endswith(")"):
+        inside = expr[7:-1]
+        return wrap_omml(
+            omml_matrix(inside)
+        )
 
     return wrap_omml(
         omml_text(expr)
