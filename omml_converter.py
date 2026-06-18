@@ -1,9 +1,33 @@
 import html
 
+GREEK_MAP = {
+    "alpha": "α",
+    "beta": "β",
+    "gamma": "γ",
+    "delta": "δ",
+    "theta": "θ",
+    "lambda": "λ",
+    "mu": "μ",
+    "pi": "π",
+    "sigma": "σ",
+    "omega": "ω",
+}
 
 def escape_xml(text: str) -> str:
     return html.escape(text, quote=False)
 
+    GREEK_MAP = {
+    "alpha": "α",
+    "beta": "β",
+    "gamma": "γ",
+    "delta": "δ",
+    "theta": "θ",
+    "lambda": "λ",
+    "mu": "μ",
+    "pi": "π",
+    "sigma": "σ",
+    "omega": "ω",
+    }
 
 def omml_text(text: str) -> str:
     text = escape_xml(text)
@@ -168,6 +192,14 @@ def wrap_omml(math_body: str) -> str:
 
 def plain_to_omml(expr: str) -> str:
     expr = expr.strip()
+
+    if expr.startswith("\\"):
+        expr = expr[1:]
+
+    if expr in GREEK_MAP:
+        return wrap_omml(
+            omml_text(GREEK_MAP[expr])
+        )
 
     if expr.startswith("frac(") and expr.endswith(")"):
         inside = expr[5:-1]
