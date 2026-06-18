@@ -194,6 +194,24 @@ def omml_matrix(matrix_text: str) -> str:
     )
 
 
+def omml_limit(variable: str, target: str, body: str) -> str:
+    variable = escape_xml(variable)
+    target = escape_xml(target)
+    body = escape_xml(body)
+
+    return (
+        "<m:limLow>"
+        "<m:e>"
+        + omml_text("lim")
+        + "</m:e>"
+        "<m:lim>"
+        + omml_text(variable + "→" + target)
+        + "</m:lim>"
+        "</m:limLow>"
+        + omml_text(body)
+    )
+
+
 def omml_subscript(base: str, sub: str) -> str:
     base = escape_xml(base)
     sub = escape_xml(sub)
@@ -236,7 +254,6 @@ def plain_to_omml(expr: str) -> str:
         return wrap_omml(
             omml_text(GREEK_MAP[expr])
         )
-
 
     if expr.startswith("frac(") and expr.endswith(")"):
         inside = expr[5:-1]
@@ -319,6 +336,16 @@ def plain_to_omml(expr: str) -> str:
         return wrap_omml(
             omml_matrix(inside)
         )
+    
+    if expr.startswith("lim(") and expr.endswith(")"):
+        inside = expr[4:-1]
+        parts = [p.strip() for p in inside.split(",")]
+
+        if len(parts) == 3:
+            variable, target, body = parts
+            return wrap_omml(
+                omml_limit(variable, target, body)
+            )
 
     return wrap_omml(
         omml_text(expr)
