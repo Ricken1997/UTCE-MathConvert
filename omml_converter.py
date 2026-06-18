@@ -65,6 +65,81 @@ def omml_sqrt(value: str) -> str:
     )
 
 
+def omml_sum(index: str, start: str, end: str, body: str) -> str:
+    index = escape_xml(index)
+    start = escape_xml(start)
+    end = escape_xml(end)
+    body = escape_xml(body)
+
+    return (
+        "<m:nary>"
+        "<m:naryPr>"
+        "<m:chr m:val=\"∑\"/>"
+        "<m:limLoc m:val=\"undOvr\"/>"
+        "</m:naryPr>"
+        "<m:sub>"
+        + omml_text(index + "=" + start)
+        + "</m:sub>"
+        "<m:sup>"
+        + omml_text(end)
+        + "</m:sup>"
+        "<m:e>"
+        + omml_text(body)
+        + "</m:e>"
+        "</m:nary>"
+    )
+
+
+def omml_prod(index: str, start: str, end: str, body: str) -> str:
+    index = escape_xml(index)
+    start = escape_xml(start)
+    end = escape_xml(end)
+    body = escape_xml(body)
+
+    return (
+        "<m:nary>"
+        "<m:naryPr>"
+        "<m:chr m:val=\"∏\"/>"
+        "<m:limLoc m:val=\"undOvr\"/>"
+        "</m:naryPr>"
+        "<m:sub>"
+        + omml_text(index + "=" + start)
+        + "</m:sub>"
+        "<m:sup>"
+        + omml_text(end)
+        + "</m:sup>"
+        "<m:e>"
+        + omml_text(body)
+        + "</m:e>"
+        "</m:nary>"
+    )
+
+
+def omml_integral(variable: str, lower: str, upper: str, body: str) -> str:
+    variable = escape_xml(variable)
+    lower = escape_xml(lower)
+    upper = escape_xml(upper)
+    body = escape_xml(body)
+
+    return (
+        "<m:nary>"
+        "<m:naryPr>"
+        "<m:chr m:val=\"∫\"/>"
+        "<m:limLoc m:val=\"subSup\"/>"
+        "</m:naryPr>"
+        "<m:sub>"
+        + omml_text(lower)
+        + "</m:sub>"
+        "<m:sup>"
+        + omml_text(upper)
+        + "</m:sup>"
+        "<m:e>"
+        + omml_text(body + " d" + variable)
+        + "</m:e>"
+        "</m:nary>"
+    )
+
+
 def omml_subscript(base: str, sub: str) -> str:
     base = escape_xml(base)
     sub = escape_xml(sub)
@@ -139,6 +214,36 @@ def plain_to_omml(expr: str) -> str:
         return wrap_omml(
             omml_sqrt(inside)
         )
+
+    if expr.startswith("sum(") and expr.endswith(")"):
+        inside = expr[4:-1]
+        parts = [p.strip() for p in inside.split(",")]
+
+        if len(parts) == 4:
+            index, start, end, body = parts
+            return wrap_omml(
+                omml_sum(index, start, end, body)
+            )
+    
+    if expr.startswith("prod(") and expr.endswith(")"):
+        inside = expr[5:-1]
+        parts = [p.strip() for p in inside.split(",")]
+
+        if len(parts) == 4:
+            index, start, end, body = parts
+            return wrap_omml(
+                omml_prod(index, start, end, body)
+            )
+    
+    if expr.startswith("int(") and expr.endswith(")"):
+        inside = expr[4:-1]
+        parts = [p.strip() for p in inside.split(",")]
+
+        if len(parts) == 4:
+            variable, lower, upper, body = parts
+            return wrap_omml(
+                omml_integral(variable, lower, upper, body)
+            )
 
     return wrap_omml(
         omml_text(expr)
