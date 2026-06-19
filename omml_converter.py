@@ -212,6 +212,36 @@ def omml_limit(variable: str, target: str, body: str) -> str:
     )
 
 
+def omml_cases(cases_text: str) -> str:
+    rows = cases_text.split(";")
+
+    row_xml = ""
+
+    for row in rows:
+        parts = [p.strip() for p in row.split(",")]
+
+        if len(parts) == 2:
+            value, condition = parts
+
+            row_xml += (
+                "<m:mr>"
+                "<m:e>"
+                + omml_text(value)
+                + "</m:e>"
+                "<m:e>"
+                + omml_text(condition)
+                + "</m:e>"
+                "</m:mr>"
+            )
+
+    return (
+        "<m:m>"
+        "<m:mPr/>"
+        + row_xml
+        + "</m:m>"
+    )
+
+
 def omml_subscript(base: str, sub: str) -> str:
     base = escape_xml(base)
     sub = escape_xml(sub)
@@ -346,6 +376,12 @@ def plain_to_omml(expr: str) -> str:
             return wrap_omml(
                 omml_limit(variable, target, body)
             )
+    
+    if expr.startswith("cases(") and expr.endswith(")"):
+        inside = expr[6:-1]
+        return wrap_omml(
+            omml_cases(inside)
+        )
 
     return wrap_omml(
         omml_text(expr)
