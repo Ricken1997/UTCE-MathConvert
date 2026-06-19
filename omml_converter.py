@@ -16,18 +16,6 @@ GREEK_MAP = {
 def escape_xml(text: str) -> str:
     return html.escape(text, quote=False)
 
-    GREEK_MAP = {
-    "alpha": "α",
-    "beta": "β",
-    "gamma": "γ",
-    "delta": "δ",
-    "theta": "θ",
-    "lambda": "λ",
-    "mu": "μ",
-    "pi": "π",
-    "sigma": "σ",
-    "omega": "ω",
-    }
 
 def omml_text(text: str) -> str:
     text = escape_xml(text)
@@ -38,6 +26,16 @@ def omml_text(text: str) -> str:
         + text
         + "</m:t>"
         "</m:r>"
+    )
+
+
+def wrap_omml(math_body: str) -> str:
+    return (
+        "<m:oMathPara>"
+        "<m:oMath>"
+        + math_body
+        + "</m:oMath>"
+        "</m:oMathPara>"
     )
 
 
@@ -70,6 +68,22 @@ def omml_superscript(base: str, sup: str) -> str:
         + omml_text(sup)
         + "</m:sup>"
         "</m:sSup>"
+    )
+
+
+def omml_subscript(base: str, sub: str) -> str:
+    base = escape_xml(base)
+    sub = escape_xml(sub)
+
+    return (
+        "<m:sSub>"
+        "<m:e>"
+        + omml_text(base)
+        + "</m:e>"
+        "<m:sub>"
+        + omml_text(sub)
+        + "</m:sub>"
+        "</m:sSub>"
     )
 
 
@@ -242,29 +256,39 @@ def omml_cases(cases_text: str) -> str:
     )
 
 
-def omml_subscript(base: str, sub: str) -> str:
+def omml_subsup(base: str, sub: str, sup: str) -> str:
     base = escape_xml(base)
     sub = escape_xml(sub)
+    sup = escape_xml(sup)
 
     return (
-        "<m:sSub>"
+        "<m:sSubSup>"
         "<m:e>"
         + omml_text(base)
         + "</m:e>"
         "<m:sub>"
         + omml_text(sub)
         + "</m:sub>"
-        "</m:sSub>"
+        "<m:sup>"
+        + omml_text(sup)
+        + "</m:sup>"
+        "</m:sSubSup>"
     )
 
 
-def wrap_omml(math_body: str) -> str:
+def omml_diff(body: str, variable: str) -> str:
+    body = escape_xml(body)
+    variable = escape_xml(variable)
+
     return (
-        "<m:oMathPara>"
-        "<m:oMath>"
-        + math_body
-        + "</m:oMath>"
-        "</m:oMathPara>"
+        "<m:f>"
+        "<m:num>"
+        + omml_text("d" + body)
+        + "</m:num>"
+        "<m:den>"
+        + omml_text("d" + variable)
+        + "</m:den>"
+        "</m:f>"
     )
 
 
@@ -382,6 +406,26 @@ def plain_to_omml(expr: str) -> str:
         return wrap_omml(
             omml_cases(inside)
         )
+    
+    if expr.startswith("subsup(") and expr.endswith(")"):
+        inside = expr[7:-1]
+        parts = [p.strip() for p in inside.split(",")]
+
+        if len(parts) == 3:
+            base, sub, sup = parts
+            return wrap_omml(
+                omml_subsup(base, sub, sup)
+            )
+
+    if expr.startswith("diff(") and expr.endswith(")"):
+        inside = expr[5:-1]
+        parts = [p.strip() for p in inside.split(",")]
+
+        if len(parts) == 2:
+            body, variable = parts
+            return wrap_omml(
+                omml_diff(body, variable)
+            )
 
     return wrap_omml(
         omml_text(expr)

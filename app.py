@@ -67,6 +67,8 @@ def convert_text():
 def clear_all():
     input_box.delete("1.0", tk.END)
     output_box.delete("1.0", tk.END)
+    mathml_box.delete("1.0", tk.END)
+    omml_box.delete("1.0", tk.END)
 
     warning_box.config(text="")
     confidence_var.set("Confidence:")
