@@ -1,0 +1,12 @@
+alpha
+frac(1,2)
+sqrt(x)
+sub(a,i)
+subsup(a,i,n)
+sum(i,1,n,i^2)
+prod(i,1,n,a_i)
+int(x,0,1,x^2)
+lim(x,0,sin(x)/x)
+matrix(1,2;3,4)
+cases(x^2,x>0;0,x<=0)
+diff(f,x)
