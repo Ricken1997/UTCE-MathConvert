@@ -292,8 +292,57 @@ def omml_diff(body: str, variable: str) -> str:
     )
 
 
+def omml_run(text):
+    return f"<m:r><m:t>{text}</m:t></m:r>"
+
+
+def strip_omml_wrapper(omml):
+    return (
+        omml
+        .replace("<m:oMathPara><m:oMath>", "")
+        .replace("</m:oMath></m:oMathPara>", "")
+    )
+
+
+def omml_shallow_composite(text):
+    operators = [" + ", " - ", " * ", " / "]
+
+    for op in operators:
+        if op in text:
+            left, right = text.split(op, 1)
+
+            left = left.strip()
+            right = right.strip()
+            
+            symbol_map = {
+                "+": "+",
+                "-": "−",
+                "*": "×",
+                "/": "÷",
+            }
+
+            symbol = symbol_map.get(op.strip(), op.strip())
+
+            left_omml = strip_omml_wrapper(plain_to_omml(left))
+            right_omml = strip_omml_wrapper(plain_to_omml(right))
+
+            return (
+                "<m:oMathPara><m:oMath>"
+                + left_omml
+                + omml_run(symbol)
+                + right_omml
+                + "</m:oMath></m:oMathPara>"
+            )
+
+    return None
+
+
 def plain_to_omml(expr: str) -> str:
     expr = expr.strip()
+
+    composite = omml_shallow_composite(expr)
+    if composite:
+        return composite
 
     # Remove inline/block LaTeX markers if they arrive here
     if expr.startswith("$") and expr.endswith("$"):

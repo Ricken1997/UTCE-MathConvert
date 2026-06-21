@@ -491,8 +491,63 @@ def analyze_lines(lines: list[str]):
 
         if not text:
             continue
+        
+        line_warnings = []
 
-        line_warnings = validate_plain_math(text)
+        # Argument validation for common Beta 1.0 structures
+        if text.startswith("frac(") and text.endswith(")"):
+            inner = text[5:-1]
+            parts = [p.strip() for p in inner.split(",")]
+            if len(parts) != 2 or not parts[0] or not parts[1]:
+                line_warnings.append(
+                    "frac requires exactly 2 non-empty arguments: frac(numerator, denominator)."
+                )
+
+        if text.startswith("sqrt(") and text.endswith(")"):
+            inner = text[5:-1].strip()
+            if not inner:
+                line_warnings.append(
+                    "sqrt requires 1 non-empty argument: sqrt(value)."
+                )
+
+        if text.startswith("matrix(") and text.endswith(")"):
+            inner = text[7:-1]
+            rows = inner.split(";")
+            row_lengths = [len([c for c in row.split(",")]) for row in rows]
+
+            if len(set(row_lengths)) > 1:
+                line_warnings.append(
+                    "Matrix row lengths differ. Each row should have the same number of columns."
+                )
+
+        # Direct LaTeX detection
+        if "\\" in text:
+            line_warnings.append(
+                "Direct LaTeX input is not supported in Beta 1.0."
+            )
+
+        # Composite expression detection
+        if any(op in text for op in [" + ", " - ", " * ", " = "]):
+            line_warnings.append(
+                "Composite expressions are not supported in Beta 1.0."
+            )
+
+        # Nested expression detection
+        function_names = [
+            "frac(", "sqrt(", "sup(", "pow(", "sub(",
+            "subsup(", "sum(", "prod(", "int(",
+            "diff(", "lim(", "matrix(", "cases("
+        ]
+
+        hit_count = sum(text.count(fn) for fn in function_names)
+
+        if hit_count >= 2:
+            line_warnings.append(
+                "Nested expressions are not supported in Beta 1.0."
+            )
+
+        # 既存の警告を追加
+        line_warnings.extend(validate_plain_math(text))
 
         for warning in line_warnings:
             warning_info = create_warning_info(line_number, warning, text)

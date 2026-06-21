@@ -4,6 +4,10 @@ from tkinter import ttk
 from tkinter import filedialog
 from tkinter import messagebox
 
+from docx import Document
+from docx.oxml import parse_xml
+from docx.oxml.ns import nsdecls
+
 from utce_core_refactor_work import (
     analyze_lines,
     build_latex_output,
@@ -102,6 +106,52 @@ def save_output():
     messagebox.showinfo("Saved", f"Output saved successfully:\n{file_path}")
 
 
+def save_word_docx():
+    omml_text = omml_box.get("1.0", tk.END).strip()
+
+    if not omml_text:
+        messagebox.showwarning(
+            "No OMML",
+            "Please convert text before saving."
+        )
+        return
+
+    file_path = filedialog.asksaveasfilename(
+        defaultextension=".docx",
+        filetypes=[("Word Document", "*.docx")]
+    )
+
+    if not file_path:
+        return
+
+    doc = Document()
+
+    for line in omml_text.splitlines():
+        line = line.strip()
+
+        if not line:
+            continue
+
+        p = doc.add_paragraph()
+
+        try:
+            wrapped = f'<root {nsdecls("m")}>{line}</root>'
+            root_element = parse_xml(wrapped)
+
+            for child in root_element:
+                p._element.append(child)
+
+        except Exception as e:
+            p.add_run(f"[OMML parse error] {line}")
+
+    doc.save(file_path)
+
+    messagebox.showinfo(
+        "Saved",
+        f"Saved:\n{file_path}"
+    )
+
+
 def copy_output():
     output_text = output_box.get("1.0", tk.END).strip()
 
@@ -183,7 +233,12 @@ def open_text_file():
 
 root = tk.Tk()
 root.title(APP_TITLE)
-root.geometry("900x760")
+root.geometry("1400x1050")
+root.minsize(1200, 900)
+
+# macOS / PyInstaller 起動時の描画ズレ対策
+root.update_idletasks()
+root.after(100, lambda: root.geometry("1200x820"))
 
 main_frame = ttk.Frame(root, padding=12)
 main_frame.pack(fill="both", expand=True)
@@ -226,6 +281,9 @@ example_button.pack(side="left", padx=(0, 8))
 save_button = ttk.Button(control_frame, text="Save Output", command=save_output)
 save_button.pack(side="left", padx=(0, 8))
 
+save_word_button = ttk.Button(control_frame, text="Save Word", command=save_word_docx)
+save_word_button.pack(side="left", padx=(0, 8))
+
 copy_button = ttk.Button(control_frame, text="Copy Output", command=copy_output)
 copy_button.pack(side="left", padx=(0, 8))
 
@@ -255,35 +313,38 @@ block_radio.pack(side="left")
 
 # Output
 output_label = ttk.Label(main_frame, text="LaTeX Output")
-output_label.pack(anchor="w")
+output_label.pack(anchor="w", pady=(8, 2))
 
-output_box = tk.Text(main_frame, height=10, wrap="word")
-output_box.pack(fill="both", expand=False, pady=(0, 10))
+output_box = tk.Text(main_frame, height=7, wrap="word")
+output_box.pack(fill="both", expand=False, pady=(0, 8))
 
 # MathML Output
 mathml_label = ttk.Label(main_frame, text="MathML Output")
-mathml_label.pack(anchor="w")
+mathml_label.pack(anchor="w", pady=(8, 2))
 
-mathml_box = tk.Text(main_frame, height=8)
-mathml_box.pack(fill="both", expand=False, pady=(0,10))
+mathml_box = tk.Text(main_frame, height=5)
+mathml_box.pack(fill="both", expand=False, pady=(0, 8))
 
 # OMML Output
 omml_label = ttk.Label(main_frame, text="OMML Output")
-omml_label.pack(anchor="w")
+omml_label.pack(anchor="w", pady=(8, 2))
 
-omml_box = tk.Text(main_frame, height=8, wrap="word")
-omml_box.pack(fill="both", expand=False, pady=(0, 10))
+omml_box = tk.Text(main_frame, height=5, wrap="word")
+omml_box.pack(fill="both", expand=False, pady=(0, 8))
 
 # Warnings
 warning_label = ttk.Label(main_frame, text="Warnings")
-warning_label.pack(anchor="w")
+warning_label.pack(anchor="w", pady=(8, 2))
 
 warning_box = ttk.Label(main_frame, text="", wraplength=850, justify="left")
-warning_box.pack(anchor="w", pady=(0, 10))
+warning_box.pack(anchor="w", pady=(0, 8))
 
 # Diagnosis
 diagnosis_label = ttk.Label(main_frame, text="Structural Diagnosis")
-diagnosis_label.pack(anchor="w")
+diagnosis_label.pack(anchor="w", pady=(8, 2))
+
+diagnosis_box = ttk.Label(main_frame, text="", wraplength=850, justify="left")
+diagnosis_box.pack(anchor="w", pady=(0, 8))
 
 confidence_var = tk.StringVar(value="Confidence:")
 risk_var = tk.StringVar(value="Predictive Risk:")
