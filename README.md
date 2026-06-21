@@ -1,36 +1,51 @@
-# UTCE MathConvert Beta 1.0
+# UTCE MathConvert Free Beta 1.0
 
-Based on v20.0-core-product
+UTCE MathConvert is a plain-math to LaTeX / MathML / Word OMML converter.
 
-## Overview
+## Main Features
 
-UTCE MathConvert is an experimental plain-math conversion tool for generating LaTeX, MathML, and True OMML output.
-
-## Features
-
-- Greek Symbols
-- Fraction
-- Square Root
-- Superscript
-- Subscript
-- Subscript + Superscript
+- Greek symbols
+- Fractions
+- Square roots
+- Superscripts
+- Subscripts
 - Summation
 - Product
 - Integral
+- Derivative
 - Limit
 - Matrix
 - Cases
-- Derivative
+- Basic operators (+ − × ÷)
+- Native Word equation (.docx) export
+
+## Recommended Use
+
+- Reports
+- Undergraduate theses
+- Graduate reports
+- Office documents
+- Academic drafts
+
+## Known Limitations
+
+- Nested expressions are partially supported.
+- Very complex formulas may not render correctly.
+- Operator precedence is still under development.
+- Beta version: please verify output before important use.
 
 ## Outputs
 
 - LaTeX
 - MathML
 - True OMML
+- Word .docx with native equations
 
-## Usage
+## Version
 
-Run:
+Free Beta 1.0
 
-```bash
-python3 app.py
+Future:
+
+- v1.1 Recursive nesting
+- v2.0 Full parser engine
