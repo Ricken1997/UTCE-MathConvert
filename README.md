@@ -49,3 +49,79 @@ Future:
 
 - v1.1 Recursive nesting
 - v2.0 Full parser engine
+
+
+
+# UTCE-MathConvert
+
+Plain Math → Word OMML Converter
+
+---
+
+## Main Window
+
+![Main Window](images/main_window.png)
+
+---
+
+## Word Output
+
+![Word Output](images/word_output.png)
+
+---
+
+## Complex Formula Example
+
+![Complex Formula](images/complex_formula.png)
+
+---
+
+## Application Icon
+
+![Application Icon](images/main.png)
+
+---
+
+## Features
+
+- Greek symbols
+- Fractions
+- Square roots
+- Superscripts
+- Subscripts
+- Summation
+- Product
+- Integral
+- Limits
+- Matrix
+- Cases
+- Derivatives
+- + − × ÷ operators
+- Native Word OMML output
+
+---
+
+## Outputs
+
+- LaTeX
+- MathML
+- Word OMML
+- .docx with native equations
+
+---
+
+## Platform
+
+macOS (Apple Silicon)
+
+---
+
+## Author
+
+Yuichi Fujiki
+
+---
+
+## License
+
+MIT License
