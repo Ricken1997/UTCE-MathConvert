@@ -58,6 +58,12 @@ Plain Math → Word OMML Converter
 
 ---
 
+## Application Icon
+
+![Application Icon](images/main.png)
+
+---
+
 ## Main Window
 
 ![Main Window](images/main_window.png)
@@ -73,12 +79,6 @@ Plain Math → Word OMML Converter
 ## Complex Formula Example
 
 ![Complex Formula](images/complex_formula.png)
-
----
-
-## Application Icon
-
-![Application Icon](images/main.png)
 
 ---
 
