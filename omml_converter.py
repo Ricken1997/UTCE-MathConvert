@@ -304,45 +304,73 @@ def strip_omml_wrapper(omml):
     )
 
 
-def omml_shallow_composite(text):
-    operators = [" + ", " - ", " * ", " / "]
+def find_top_level_operator(text: str):
+    """
+    Find the rightmost top-level operator outside parentheses.
+    Returns (index, raw_operator, display_operator) or None.
+    """
+    operators = [
+        ("+", "+"),
+        ("-", "−"),
+        ("*", "×"),
+        ("×", "×"),
+        ("/", "÷"),
+        ("÷", "÷"),
+    ]
 
-    for op in operators:
-        if op in text:
-            left, right = text.split(op, 1)
+    depth = 0
 
-            left = left.strip()
-            right = right.strip()
-            
-            symbol_map = {
-                "+": "+",
-                "-": "−",
-                "*": "×",
-                "/": "÷",
-            }
+    for i in range(len(text) - 1, -1, -1):
+        ch = text[i]
 
-            symbol = symbol_map.get(op.strip(), op.strip())
+        if ch == ")":
+            depth += 1
+            continue
 
-            left_omml = strip_omml_wrapper(plain_to_omml(left))
-            right_omml = strip_omml_wrapper(plain_to_omml(right))
+        if ch == "(":
+            depth -= 1
+            continue
 
-            return (
-                "<m:oMathPara><m:oMath>"
-                + left_omml
-                + omml_run(symbol)
-                + right_omml
-                + "</m:oMath></m:oMathPara>"
-            )
+        if depth == 0:
+            for raw_op, display_op in operators:
+                if text.startswith(raw_op, i):
+                    return i, raw_op, display_op
 
     return None
 
 
+def omml_shallow_composite(text):
+    text = text.strip()
+
+    found = find_top_level_operator(text)
+    if not found:
+        return None
+
+    index, raw_op, display_op = found
+
+    left = text[:index].strip()
+    right = text[index + len(raw_op):].strip()
+
+    if not left or not right:
+        return None
+
+    left_result = plain_to_omml(left)
+    right_result = plain_to_omml(right)
+
+    left_omml = strip_omml_wrapper(left_result)
+    right_omml = strip_omml_wrapper(right_result)
+
+    return (
+        "<m:oMathPara><m:oMath>"
+        + left_omml
+        + omml_run(display_op)
+        + right_omml
+        + "</m:oMath></m:oMathPara>"
+    )
+
+
 def plain_to_omml(expr: str) -> str:
     expr = expr.strip()
-
-    composite = omml_shallow_composite(expr)
-    if composite:
-        return composite
 
     # Remove inline/block LaTeX markers if they arrive here
     if expr.startswith("$") and expr.endswith("$"):
@@ -475,6 +503,10 @@ def plain_to_omml(expr: str) -> str:
             return wrap_omml(
                 omml_diff(body, variable)
             )
+    
+    composite = omml_shallow_composite(expr)
+    if composite:
+        return composite
 
     return wrap_omml(
         omml_text(expr)
