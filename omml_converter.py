@@ -392,8 +392,15 @@ def plain_to_omml(expr: str) -> str:
 
         if len(parts) == 2:
             numerator, denominator = parts
+
+            num_omml = strip_omml_wrapper(
+            plain_to_omml(numerator))
+
+            den_omml = strip_omml_wrapper(
+            plain_to_omml(denominator))
+
             return wrap_omml(
-                omml_fraction(numerator, denominator)
+            omml_fraction(num_omml, den_omml)
             )
 
         if expr.startswith("pow(") and expr.endswith(")"):
@@ -428,8 +435,12 @@ def plain_to_omml(expr: str) -> str:
     
     if expr.startswith("sqrt(") and expr.endswith(")"):
         inside = expr[5:-1].strip()
+
+        inside_omml = strip_omml_wrapper(
+        plain_to_omml(inside))
+
         return wrap_omml(
-            omml_sqrt(inside)
+        omml_sqrt(inside_omml)
         )
 
     if expr.startswith("sum(") and expr.endswith(")"):
