@@ -29,6 +29,10 @@ def omml_text(text: str) -> str:
     )
 
 
+def omml_raw(xml: str) -> str:
+    return xml
+
+
 def wrap_omml(math_body: str) -> str:
     return (
         "<m:oMathPara>"
@@ -40,16 +44,14 @@ def wrap_omml(math_body: str) -> str:
 
 
 def omml_fraction(numerator: str, denominator: str) -> str:
-    numerator = escape_xml(numerator)
-    denominator = escape_xml(denominator)
 
     return (
         "<m:f>"
         "<m:num>"
-        + omml_text(numerator)
+        + numerator
         + "</m:num>"
         "<m:den>"
-        + omml_text(denominator)
+        + denominator
         + "</m:den>"
         "</m:f>"
     )
@@ -88,7 +90,6 @@ def omml_subscript(base: str, sub: str) -> str:
 
 
 def omml_sqrt(value: str) -> str:
-    value = escape_xml(value)
 
     return (
         "<m:rad>"
@@ -97,7 +98,7 @@ def omml_sqrt(value: str) -> str:
         "</m:radPr>"
         "<m:deg/>"
         "<m:e>"
-        + omml_text(value)
+        + value
         + "</m:e>"
         "</m:rad>"
     )
