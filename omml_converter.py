@@ -105,10 +105,10 @@ def omml_sqrt(value: str) -> str:
 
 
 def omml_sum(index: str, start: str, end: str, body: str) -> str:
-    index = escape_xml(index)
-    start = escape_xml(start)
-    end = escape_xml(end)
-    body = escape_xml(body)
+    index = strip_omml_wrapper(index)
+    start = strip_omml_wrapper(start)
+    end = strip_omml_wrapper(end)
+    body = strip_omml_wrapper(body)
 
     return (
         "<m:nary>"
@@ -117,13 +117,15 @@ def omml_sum(index: str, start: str, end: str, body: str) -> str:
         "<m:limLoc m:val=\"undOvr\"/>"
         "</m:naryPr>"
         "<m:sub>"
-        + omml_text(index + "=" + start)
+        + index
+        + "<m:r><m:t>=</m:t></m:r>"
+        + start
         + "</m:sub>"
         "<m:sup>"
-        + omml_text(end)
+        + end
         + "</m:sup>"
         "<m:e>"
-        + omml_text(body)
+        + body
         + "</m:e>"
         "</m:nary>"
     )
@@ -370,6 +372,29 @@ def omml_shallow_composite(text):
     )
 
 
+def split_args(s: str) -> list[str]:
+    parts = []
+    buf = ""
+    depth = 0
+
+    for ch in s:
+        if ch == "(":
+            depth += 1
+        elif ch == ")":
+            depth -= 1
+
+        if ch == "," and depth == 0:
+            parts.append(buf.strip())
+            buf = ""
+        else:
+            buf += ch
+
+    if buf.strip():
+        parts.append(buf.strip())
+
+    return parts
+
+
 def plain_to_omml(expr: str) -> str:
     expr = expr.strip()
 
@@ -446,12 +471,18 @@ def plain_to_omml(expr: str) -> str:
 
     if expr.startswith("sum(") and expr.endswith(")"):
         inside = expr[4:-1]
-        parts = [p.strip() for p in inside.split(",")]
+        parts = split_args(inside)
 
         if len(parts) == 4:
             index, start, end, body = parts
+
+            index_omml = strip_omml_wrapper(plain_to_omml(index))
+            start_omml = strip_omml_wrapper(plain_to_omml(start))
+            end_omml = strip_omml_wrapper(plain_to_omml(end))
+            body_omml = strip_omml_wrapper(plain_to_omml(body))
+
             return wrap_omml(
-                omml_sum(index, start, end, body)
+                omml_sum(index_omml, start_omml, end_omml, body_omml)
             )
     
     if expr.startswith("prod(") and expr.endswith(")"):
