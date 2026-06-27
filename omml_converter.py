@@ -390,7 +390,7 @@ def split_args(s: str) -> list[str]:
 def plain_to_omml(expr: str) -> str:
     expr = expr.strip()
 
-    # Remove inline/block LaTeX markers if they arrive here
+    # Remove inline/block LaTeX markers
     if expr.startswith("$") and expr.endswith("$"):
         expr = expr[1:-1].strip()
 
@@ -398,69 +398,82 @@ def plain_to_omml(expr: str) -> str:
     if expr.startswith("\\"):
         expr = expr[1:]
 
-    # Greek symbol conversion
+    # Greek symbol
     if expr in GREEK_MAP:
         return wrap_omml(
             omml_text(GREEK_MAP[expr])
         )
 
+    # frac(numerator, denominator)
     if expr.startswith("frac(") and expr.endswith(")"):
         inside = expr[5:-1]
-        parts = [p.strip() for p in inside.split(",")]
+        parts = split_args(inside)
 
         if len(parts) == 2:
             numerator, denominator = parts
 
-            num_omml = strip_omml_wrapper(
-            plain_to_omml(numerator))
-
-            den_omml = strip_omml_wrapper(
-            plain_to_omml(denominator))
+            num_omml = strip_omml_wrapper(plain_to_omml(numerator))
+            den_omml = strip_omml_wrapper(plain_to_omml(denominator))
 
             return wrap_omml(
-            omml_fraction(num_omml, den_omml)
+                omml_fraction(num_omml, den_omml)
             )
 
-        if expr.startswith("pow(") and expr.endswith(")"):
-            inside = expr[4:-1]
-            parts = [p.strip() for p in inside.split(",")]
+    # sqrt(value)
+    if expr.startswith("sqrt(") and expr.endswith(")"):
+        inside = expr[5:-1]
+        inside_omml = strip_omml_wrapper(plain_to_omml(inside))
 
-            if len(parts) == 2:
-                base, sup = parts
-                return wrap_omml(
-                    omml_superscript(base, sup)
-                )
+        return wrap_omml(
+            omml_sqrt(inside_omml)
+        )
 
-    if expr.startswith("sup(") and expr.endswith(")"):
+    # pow(base, exponent)
+    if expr.startswith("pow(") and expr.endswith(")"):
         inside = expr[4:-1]
-        parts = [p.strip() for p in inside.split(",")]
+        parts = split_args(inside)
 
         if len(parts) == 2:
             base, sup = parts
+
+            base_omml = strip_omml_wrapper(plain_to_omml(base))
+            sup_omml = strip_omml_wrapper(plain_to_omml(sup))
+
             return wrap_omml(
-                omml_superscript(base, sup)
+                omml_superscript(base_omml, sup_omml)
             )
 
+    # sup(base, exponent)
+    if expr.startswith("sup(") and expr.endswith(")"):
+        inside = expr[4:-1]
+        parts = split_args(inside)
+
+        if len(parts) == 2:
+            base, sup = parts
+
+            base_omml = strip_omml_wrapper(plain_to_omml(base))
+            sup_omml = strip_omml_wrapper(plain_to_omml(sup))
+
+            return wrap_omml(
+                omml_superscript(base_omml, sup_omml)
+            )
+
+    # sub(base, subscript)
     if expr.startswith("sub(") and expr.endswith(")"):
         inside = expr[4:-1]
-        parts = [p.strip() for p in inside.split(",")]
+        parts = split_args(inside)
 
         if len(parts) == 2:
             base, sub = parts
+
+            base_omml = strip_omml_wrapper(plain_to_omml(base))
+            sub_omml = strip_omml_wrapper(plain_to_omml(sub))
+
             return wrap_omml(
-                omml_subscript(base, sub)
+                omml_subscript(base_omml, sub_omml)
             )
-    
-    if expr.startswith("sqrt(") and expr.endswith(")"):
-        inside = expr[5:-1].strip()
 
-        inside_omml = strip_omml_wrapper(
-        plain_to_omml(inside))
-
-        return wrap_omml(
-        omml_sqrt(inside_omml)
-        )
-
+    # sum(index, start, end, body)
     if expr.startswith("sum(") and expr.endswith(")"):
         inside = expr[4:-1]
         parts = split_args(inside)
@@ -476,7 +489,8 @@ def plain_to_omml(expr: str) -> str:
             return wrap_omml(
                 omml_sum(index_omml, start_omml, end_omml, body_omml)
             )
-    
+
+    # prod(index, start, end, body)
     if expr.startswith("prod(") and expr.endswith(")"):
         inside = expr[5:-1]
         parts = split_args(inside)
@@ -490,9 +504,10 @@ def plain_to_omml(expr: str) -> str:
             body_omml = strip_omml_wrapper(plain_to_omml(body))
 
             return wrap_omml(
-            omml_prod(index_omml, start_omml, end_omml, body_omml)
-        )
-    
+                omml_prod(index_omml, start_omml, end_omml, body_omml)
+            )
+
+    # int(variable, lower, upper, body)
     if expr.startswith("int(") and expr.endswith(")"):
         inside = expr[4:-1]
         parts = split_args(inside)
@@ -508,53 +523,38 @@ def plain_to_omml(expr: str) -> str:
             return wrap_omml(
                 omml_integral(variable_omml, lower_omml, upper_omml, body_omml)
             )
-    
+
+    # lim(variable, target, body)
+    if expr.startswith("lim(") and expr.endswith(")"):
+        inside = expr[4:-1]
+        parts = split_args(inside)
+
+        if len(parts) == 3:
+            variable, target, body = parts
+
+            variable_omml = strip_omml_wrapper(plain_to_omml(variable))
+            target_omml = strip_omml_wrapper(plain_to_omml(target))
+            body_omml = strip_omml_wrapper(plain_to_omml(body))
+
+            return wrap_omml(
+                omml_limit(variable_omml, target_omml, body_omml)
+            )
+
+    # matrix(...)
     if expr.startswith("matrix(") and expr.endswith(")"):
         inside = expr[7:-1]
         return wrap_omml(
             omml_matrix(inside)
         )
-    
-    if expr.startswith("lim(") and expr.endswith(")"):
-        inside = expr[4:-1]
-        parts = [p.strip() for p in inside.split(",")]
 
-        if len(parts) == 3:
-            variable, target, body = parts
-            return wrap_omml(
-                omml_limit(variable, target, body)
-            )
-    
+    # cases(...)
     if expr.startswith("cases(") and expr.endswith(")"):
         inside = expr[6:-1]
         return wrap_omml(
             omml_cases(inside)
         )
-    
-    if expr.startswith("subsup(") and expr.endswith(")"):
-        inside = expr[7:-1]
-        parts = [p.strip() for p in inside.split(",")]
 
-        if len(parts) == 3:
-            base, sub, sup = parts
-            return wrap_omml(
-                omml_subsup(base, sub, sup)
-            )
-
-    if expr.startswith("diff(") and expr.endswith(")"):
-        inside = expr[5:-1]
-        parts = [p.strip() for p in inside.split(",")]
-
-        if len(parts) == 2:
-            body, variable = parts
-            return wrap_omml(
-                omml_diff(body, variable)
-            )
-    
-    composite = omml_shallow_composite(expr)
-    if composite:
-        return composite
-
+    # fallback plain text
     return wrap_omml(
         omml_text(expr)
     )
