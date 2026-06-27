@@ -68,6 +68,18 @@ Author
 
 Yuichi Fujiki
 
+Public Release
+
+UTCE MathConvert Beta 1.0
+
 Version
 
 v20.0-core-product
+
+
+## v2.0 Core Direction
+
+- Recursive parser: ENABLED
+- Nested expressions: SUPPORTED
+- Dispatcher core: ENABLED
+- Lightweight local OMML conversion architecture
