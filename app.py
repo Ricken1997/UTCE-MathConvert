@@ -65,7 +65,7 @@ def convert_text():
 
     confidence_var.set(f"Confidence: {diagnosis.confidence_score:.1f}")
     risk_var.set(f"Predictive Risk: {diagnosis.predictive_risk:.1f}")
-    level_var.set(f"Risk Level: {diagnosis.risk_level()}")
+    level_var.set(f"Risk Level: {diagnosis.risk_level}")
 
 
 def clear_all():
