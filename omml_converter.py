@@ -400,178 +400,107 @@ def parse_function(expr: str):
     return name, args
 
 
+def to_inner_omml(expr: str) -> str:
+    return strip_omml_wrapper(
+        plain_to_omml(expr)
+    )
+
+
 def plain_to_omml(expr: str) -> str:
     expr = expr.strip()
-    name, args = parse_function(expr)
 
-    # Remove inline/block LaTeX markers
     if expr.startswith("$") and expr.endswith("$"):
         expr = expr[1:-1].strip()
 
-    # Convert LaTeX command form: \alpha -> alpha
     if expr.startswith("\\"):
         expr = expr[1:]
 
-    # Greek symbol
     if expr in GREEK_MAP:
+        return wrap_omml(omml_text(GREEK_MAP[expr]))
+
+    name, args = parse_function(expr)
+
+    if name == "frac" and len(args) == 2:
         return wrap_omml(
-            omml_text(GREEK_MAP[expr])
+            omml_fraction(
+                to_inner_omml(args[0]),
+                to_inner_omml(args[1])
+            )
         )
 
-    # frac(numerator, denominator)
-    if expr.startswith("frac(") and expr.endswith(")"):
-        inside = expr[5:-1]
-        parts = split_args(inside)
-
-        if len(parts) == 2:
-            numerator, denominator = parts
-
-            num_omml = strip_omml_wrapper(plain_to_omml(numerator))
-            den_omml = strip_omml_wrapper(plain_to_omml(denominator))
-
-            return wrap_omml(
-                omml_fraction(num_omml, den_omml)
-            )
-
-    # sqrt(value)
-    if expr.startswith("sqrt(") and expr.endswith(")"):
-        inside = expr[5:-1]
-        inside_omml = strip_omml_wrapper(plain_to_omml(inside))
-
+    if name == "sqrt" and len(args) == 1:
         return wrap_omml(
-            omml_sqrt(inside_omml)
+            omml_sqrt(
+                to_inner_omml(args[0])
+            )
         )
 
-    # pow(base, exponent)
-    if expr.startswith("pow(") and expr.endswith(")"):
-        inside = expr[4:-1]
-        parts = split_args(inside)
-
-        if len(parts) == 2:
-            base, sup = parts
-
-            base_omml = strip_omml_wrapper(plain_to_omml(base))
-            sup_omml = strip_omml_wrapper(plain_to_omml(sup))
-
-            return wrap_omml(
-                omml_superscript(base_omml, sup_omml)
-            )
-
-    # sup(base, exponent)
-    if expr.startswith("sup(") and expr.endswith(")"):
-        inside = expr[4:-1]
-        parts = split_args(inside)
-
-        if len(parts) == 2:
-            base, sup = parts
-
-            base_omml = strip_omml_wrapper(plain_to_omml(base))
-            sup_omml = strip_omml_wrapper(plain_to_omml(sup))
-
-            return wrap_omml(
-                omml_superscript(base_omml, sup_omml)
-            )
-
-    # sub(base, subscript)
-    if expr.startswith("sub(") and expr.endswith(")"):
-        inside = expr[4:-1]
-        parts = split_args(inside)
-
-        if len(parts) == 2:
-            base, sub = parts
-
-            base_omml = strip_omml_wrapper(plain_to_omml(base))
-            sub_omml = strip_omml_wrapper(plain_to_omml(sub))
-
-            return wrap_omml(
-                omml_subscript(base_omml, sub_omml)
-            )
-
-    # sum(index, start, end, body)
-    if expr.startswith("sum(") and expr.endswith(")"):
-        inside = expr[4:-1]
-        parts = split_args(inside)
-
-        if len(parts) == 4:
-            index, start, end, body = parts
-
-            index_omml = strip_omml_wrapper(plain_to_omml(index))
-            start_omml = strip_omml_wrapper(plain_to_omml(start))
-            end_omml = strip_omml_wrapper(plain_to_omml(end))
-            body_omml = strip_omml_wrapper(plain_to_omml(body))
-
-            return wrap_omml(
-                omml_sum(index_omml, start_omml, end_omml, body_omml)
-            )
-
-    # prod(index, start, end, body)
-    if expr.startswith("prod(") and expr.endswith(")"):
-        inside = expr[5:-1]
-        parts = split_args(inside)
-
-        if len(parts) == 4:
-            index, start, end, body = parts
-
-            index_omml = strip_omml_wrapper(plain_to_omml(index))
-            start_omml = strip_omml_wrapper(plain_to_omml(start))
-            end_omml = strip_omml_wrapper(plain_to_omml(end))
-            body_omml = strip_omml_wrapper(plain_to_omml(body))
-
-            return wrap_omml(
-                omml_prod(index_omml, start_omml, end_omml, body_omml)
-            )
-
-    # int(variable, lower, upper, body)
-    if expr.startswith("int(") and expr.endswith(")"):
-        inside = expr[4:-1]
-        parts = split_args(inside)
-
-        if len(parts) == 4:
-            variable, lower, upper, body = parts
-
-            variable_omml = strip_omml_wrapper(plain_to_omml(variable))
-            lower_omml = strip_omml_wrapper(plain_to_omml(lower))
-            upper_omml = strip_omml_wrapper(plain_to_omml(upper))
-            body_omml = strip_omml_wrapper(plain_to_omml(body))
-
-            return wrap_omml(
-                omml_integral(variable_omml, lower_omml, upper_omml, body_omml)
-            )
-
-    # lim(variable, target, body)
-    if expr.startswith("lim(") and expr.endswith(")"):
-        inside = expr[4:-1]
-        parts = split_args(inside)
-
-        if len(parts) == 3:
-            variable, target, body = parts
-
-            variable_omml = strip_omml_wrapper(plain_to_omml(variable))
-            target_omml = strip_omml_wrapper(plain_to_omml(target))
-            body_omml = strip_omml_wrapper(plain_to_omml(body))
-
-            return wrap_omml(
-                omml_limit(variable_omml, target_omml, body_omml)
-            )
-
-    # matrix(...)
-    if expr.startswith("matrix(") and expr.endswith(")"):
-        inside = expr[7:-1]
+    if name in ("pow", "sup") and len(args) == 2:
         return wrap_omml(
-            omml_matrix(inside)
+            omml_superscript(
+                to_inner_omml(args[0]),
+                to_inner_omml(args[1])
+            )
         )
 
-    # cases(...)
-    if expr.startswith("cases(") and expr.endswith(")"):
-        inside = expr[6:-1]
+    if name == "sub" and len(args) == 2:
         return wrap_omml(
-            omml_cases(inside)
+            omml_subscript(
+                to_inner_omml(args[0]),
+                to_inner_omml(args[1])
+            )
         )
 
-    # fallback plain text
-    return wrap_omml(
-        omml_text(expr)
-    )
+    if name == "sum" and len(args) == 4:
+        return wrap_omml(
+            omml_sum(
+                to_inner_omml(args[0]),
+                to_inner_omml(args[1]),
+                to_inner_omml(args[2]),
+                to_inner_omml(args[3])
+            )
+        )
+
+    if name == "prod" and len(args) == 4:
+        return wrap_omml(
+            omml_prod(
+                to_inner_omml(args[0]),
+                to_inner_omml(args[1]),
+                to_inner_omml(args[2]),
+                to_inner_omml(args[3])
+            )
+        )
+
+    if name == "int" and len(args) == 4:
+        return wrap_omml(
+            omml_integral(
+                to_inner_omml(args[0]),
+                to_inner_omml(args[1]),
+                to_inner_omml(args[2]),
+                to_inner_omml(args[3])
+            )
+        )
+
+    if name == "lim" and len(args) == 3:
+        return wrap_omml(
+            omml_limit(
+                to_inner_omml(args[0]),
+                to_inner_omml(args[1]),
+                to_inner_omml(args[2])
+            )
+        )
+
+    if name == "matrix" and len(args) >= 1:
+        return wrap_omml(
+            omml_matrix(expr[7:-1])
+        )
+
+    if name == "cases" and len(args) >= 1:
+        return wrap_omml(
+            omml_cases(expr[6:-1])
+        )
+
+    return wrap_omml(omml_text(expr))
 
 
 def latex_to_omml_placeholder(latex_line: str) -> str:
