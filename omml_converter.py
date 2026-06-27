@@ -173,6 +173,35 @@ def omml_integral(variable: str, lower: str, upper: str, body: str) -> str:
     )
 
 
+def omml_matrix_cells(rows: list[list[str]]) -> str:
+    row_xml = ""
+
+    for row in rows:
+        cell_xml = ""
+
+        for cell in row:
+            cell_xml += (
+                "<m:e>"
+                + cell
+                + "</m:e>"
+            )
+
+        row_xml += (
+            "<m:mr>"
+            + cell_xml
+            + "</m:mr>"
+        )
+
+    return (
+        "<m:m>"
+        "<m:mPr>"
+        "<m:baseJc m:val=\"centerGroup\"/>"
+        "</m:mPr>"
+        + row_xml +
+        "</m:m>"
+    )
+
+
 def omml_matrix(matrix_text: str) -> str:
     rows = matrix_text.split(";")
 
@@ -387,6 +416,35 @@ def split_args(s: str) -> list[str]:
     return parts
 
 
+def split_rows(text: str) -> list[str]:
+    rows = []
+    buf = ""
+    depth = 0
+
+    for ch in text:
+        if ch == "(":
+            depth += 1
+            buf += ch
+        elif ch == ")":
+            depth -= 1
+            buf += ch
+        elif ch == ";" and depth == 0:
+            rows.append(buf.strip())
+            buf = ""
+        else:
+            buf += ch
+
+    if buf.strip():
+        rows.append(buf.strip())
+
+    return rows
+
+
+def parse_matrix_cells(text: str) -> list[list[str]]:
+    rows = split_rows(text)
+    return [split_args(row) for row in rows]
+
+
 def parse_function(expr: str):
     expr = expr.strip()
 
@@ -442,6 +500,17 @@ def convert_function_to_omml(name: str, args: list[str]) -> str | None:
     if name == "lim" and len(args) == 3:
         a = args_to_omml(args)
         return omml_limit(a[0], a[1], a[2])
+    
+        if name == "matrix" and len(args) >= 1:
+            matrix_text = ",".join(args)
+            rows = parse_matrix_cells(matrix_text)
+
+            omml_rows = [
+            [to_inner_omml(cell) for cell in row]
+            for row in rows
+        ]
+
+        return omml_matrix_cells(omml_rows)
 
     return None
 
