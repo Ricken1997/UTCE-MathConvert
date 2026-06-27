@@ -406,6 +406,46 @@ def to_inner_omml(expr: str) -> str:
     )
 
 
+def args_to_omml(args):
+    return [to_inner_omml(arg) for arg in args]
+
+
+def convert_function_to_omml(name: str, args: list[str]) -> str | None:
+    if name == "frac" and len(args) == 2:
+        a = args_to_omml(args)
+        return omml_fraction(a[0], a[1])
+
+    if name == "sqrt" and len(args) == 1:
+        a = args_to_omml(args)
+        return omml_sqrt(a[0])
+
+    if name in ("pow", "sup") and len(args) == 2:
+        a = args_to_omml(args)
+        return omml_superscript(a[0], a[1])
+
+    if name == "sub" and len(args) == 2:
+        a = args_to_omml(args)
+        return omml_subscript(a[0], a[1])
+
+    if name == "sum" and len(args) == 4:
+        a = args_to_omml(args)
+        return omml_sum(a[0], a[1], a[2], a[3])
+
+    if name == "prod" and len(args) == 4:
+        a = args_to_omml(args)
+        return omml_prod(a[0], a[1], a[2], a[3])
+
+    if name == "int" and len(args) == 4:
+        a = args_to_omml(args)
+        return omml_integral(a[0], a[1], a[2], a[3])
+
+    if name == "lim" and len(args) == 3:
+        a = args_to_omml(args)
+        return omml_limit(a[0], a[1], a[2])
+
+    return None
+
+
 def plain_to_omml(expr: str) -> str:
     expr = expr.strip()
 
@@ -416,79 +456,15 @@ def plain_to_omml(expr: str) -> str:
         expr = expr[1:]
 
     if expr in GREEK_MAP:
-        return wrap_omml(omml_text(GREEK_MAP[expr]))
+        return wrap_omml(
+            omml_text(GREEK_MAP[expr])
+        )
 
     name, args = parse_function(expr)
 
-    if name == "frac" and len(args) == 2:
-        return wrap_omml(
-            omml_fraction(
-                to_inner_omml(args[0]),
-                to_inner_omml(args[1])
-            )
-        )
-
-    if name == "sqrt" and len(args) == 1:
-        return wrap_omml(
-            omml_sqrt(
-                to_inner_omml(args[0])
-            )
-        )
-
-    if name in ("pow", "sup") and len(args) == 2:
-        return wrap_omml(
-            omml_superscript(
-                to_inner_omml(args[0]),
-                to_inner_omml(args[1])
-            )
-        )
-
-    if name == "sub" and len(args) == 2:
-        return wrap_omml(
-            omml_subscript(
-                to_inner_omml(args[0]),
-                to_inner_omml(args[1])
-            )
-        )
-
-    if name == "sum" and len(args) == 4:
-        return wrap_omml(
-            omml_sum(
-                to_inner_omml(args[0]),
-                to_inner_omml(args[1]),
-                to_inner_omml(args[2]),
-                to_inner_omml(args[3])
-            )
-        )
-
-    if name == "prod" and len(args) == 4:
-        return wrap_omml(
-            omml_prod(
-                to_inner_omml(args[0]),
-                to_inner_omml(args[1]),
-                to_inner_omml(args[2]),
-                to_inner_omml(args[3])
-            )
-        )
-
-    if name == "int" and len(args) == 4:
-        return wrap_omml(
-            omml_integral(
-                to_inner_omml(args[0]),
-                to_inner_omml(args[1]),
-                to_inner_omml(args[2]),
-                to_inner_omml(args[3])
-            )
-        )
-
-    if name == "lim" and len(args) == 3:
-        return wrap_omml(
-            omml_limit(
-                to_inner_omml(args[0]),
-                to_inner_omml(args[1]),
-                to_inner_omml(args[2])
-            )
-        )
+    converted = convert_function_to_omml(name, args)
+    if converted is not None:
+        return wrap_omml(converted)
 
     if name == "matrix" and len(args) >= 1:
         return wrap_omml(
@@ -500,7 +476,9 @@ def plain_to_omml(expr: str) -> str:
             omml_cases(expr[6:-1])
         )
 
-    return wrap_omml(omml_text(expr))
+    return wrap_omml(
+        omml_text(expr)
+    )
 
 
 def latex_to_omml_placeholder(latex_line: str) -> str:
