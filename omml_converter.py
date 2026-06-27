@@ -387,8 +387,22 @@ def split_args(s: str) -> list[str]:
     return parts
 
 
+def parse_function(expr: str):
+    expr = expr.strip()
+
+    if "(" not in expr or not expr.endswith(")"):
+        return None, []
+
+    name = expr[:expr.find("(")].strip()
+    inside = expr[expr.find("(") + 1:-1]
+
+    args = split_args(inside)
+    return name, args
+
+
 def plain_to_omml(expr: str) -> str:
     expr = expr.strip()
+    name, args = parse_function(expr)
 
     # Remove inline/block LaTeX markers
     if expr.startswith("$") and expr.endswith("$"):
