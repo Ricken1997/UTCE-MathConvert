@@ -132,11 +132,6 @@ def omml_sum(index: str, start: str, end: str, body: str) -> str:
 
 
 def omml_prod(index: str, start: str, end: str, body: str) -> str:
-    index = escape_xml(index)
-    start = escape_xml(start)
-    end = escape_xml(end)
-    body = escape_xml(body)
-
     return (
         "<m:nary>"
         "<m:naryPr>"
@@ -144,24 +139,19 @@ def omml_prod(index: str, start: str, end: str, body: str) -> str:
         "<m:limLoc m:val=\"undOvr\"/>"
         "</m:naryPr>"
         "<m:sub>"
-        + omml_text(index + "=" + start)
-        + "</m:sub>"
+        + index + omml_text("=") + start +
+        "</m:sub>"
         "<m:sup>"
-        + omml_text(end)
-        + "</m:sup>"
+        + end +
+        "</m:sup>"
         "<m:e>"
-        + omml_text(body)
-        + "</m:e>"
+        + body +
+        "</m:e>"
         "</m:nary>"
     )
 
 
 def omml_integral(variable: str, lower: str, upper: str, body: str) -> str:
-    variable = escape_xml(variable)
-    lower = escape_xml(lower)
-    upper = escape_xml(upper)
-    body = escape_xml(body)
-
     return (
         "<m:nary>"
         "<m:naryPr>"
@@ -169,14 +159,16 @@ def omml_integral(variable: str, lower: str, upper: str, body: str) -> str:
         "<m:limLoc m:val=\"subSup\"/>"
         "</m:naryPr>"
         "<m:sub>"
-        + omml_text(lower)
-        + "</m:sub>"
+        + lower +
+        "</m:sub>"
         "<m:sup>"
-        + omml_text(upper)
-        + "</m:sup>"
+        + upper +
+        "</m:sup>"
         "<m:e>"
-        + omml_text(body + " d" + variable)
-        + "</m:e>"
+        + body
+        + omml_text(" d")
+        + variable +
+        "</m:e>"
         "</m:nary>"
     )
 
@@ -487,22 +479,34 @@ def plain_to_omml(expr: str) -> str:
     
     if expr.startswith("prod(") and expr.endswith(")"):
         inside = expr[5:-1]
-        parts = [p.strip() for p in inside.split(",")]
+        parts = split_args(inside)
 
         if len(parts) == 4:
             index, start, end, body = parts
+
+            index_omml = strip_omml_wrapper(plain_to_omml(index))
+            start_omml = strip_omml_wrapper(plain_to_omml(start))
+            end_omml = strip_omml_wrapper(plain_to_omml(end))
+            body_omml = strip_omml_wrapper(plain_to_omml(body))
+
             return wrap_omml(
-                omml_prod(index, start, end, body)
-            )
+            omml_prod(index_omml, start_omml, end_omml, body_omml)
+        )
     
     if expr.startswith("int(") and expr.endswith(")"):
         inside = expr[4:-1]
-        parts = [p.strip() for p in inside.split(",")]
+        parts = split_args(inside)
 
         if len(parts) == 4:
             variable, lower, upper, body = parts
+
+            variable_omml = strip_omml_wrapper(plain_to_omml(variable))
+            lower_omml = strip_omml_wrapper(plain_to_omml(lower))
+            upper_omml = strip_omml_wrapper(plain_to_omml(upper))
+            body_omml = strip_omml_wrapper(plain_to_omml(body))
+
             return wrap_omml(
-                omml_integral(variable, lower, upper, body)
+                omml_integral(variable_omml, lower_omml, upper_omml, body_omml)
             )
     
     if expr.startswith("matrix(") and expr.endswith(")"):
