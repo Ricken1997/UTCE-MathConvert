@@ -3,17 +3,54 @@
 
 """
 UTCE MathConvert Core
-v2.0 RC Diagnostic / LaTeX Support Layer
+v2.0 Product Beta
 
 Role:
-- Validate plain math input lightly.
-- Generate LaTeX preview text.
-- Provide structural diagnosis summary.
-- Do NOT block recursive OMML conversion.
+- Build LaTeX preview output.
+- Provide lightweight diagnostics.
+- Avoid false warnings for concatenated expressions.
+- Keep GUI-side logic simple.
 """
 
 from dataclasses import dataclass
-import html
+
+
+SUPPORTED_FUNCTIONS = {
+    "frac": 2,
+    "sqrt": 1,
+    "pow": 2,
+    "sup": 2,
+    "sub": 2,
+    "subsup": 3,
+    "sum": 4,
+    "prod": 4,
+    "int": 4,
+    "lim": 3,
+    "matrix": None,
+    "cases": None,
+    "align": None,
+}
+
+
+GREEK_LATEX = {
+    "alpha": "\\alpha",
+    "beta": "\\beta",
+    "gamma": "\\gamma",
+    "delta": "\\delta",
+    "epsilon": "\\epsilon",
+    "theta": "\\theta",
+    "lambda": "\\lambda",
+    "mu": "\\mu",
+    "pi": "\\pi",
+    "sigma": "\\sigma",
+    "omega": "\\omega",
+    "Delta": "\\Delta",
+    "Theta": "\\Theta",
+    "Lambda": "\\Lambda",
+    "Pi": "\\Pi",
+    "Sigma": "\\Sigma",
+    "Omega": "\\Omega",
+}
 
 
 @dataclass
@@ -32,19 +69,29 @@ class Diagnosis:
     confidence_score: float
     predictive_risk: float
     risk_level: str
-    warning_text: str
+    warning_text: str = ""
 
 
-# ============================================================
-# LaTeX Builder
-# ============================================================
+def find_matching_paren(text: str, open_index: int) -> int:
+    depth = 0
 
-def split_args(s: str) -> list[str]:
+    for i in range(open_index, len(text)):
+        if text[i] == "(":
+            depth += 1
+        elif text[i] == ")":
+            depth -= 1
+            if depth == 0:
+                return i
+
+    return -1
+
+
+def split_args(text: str) -> list[str]:
     parts = []
     buf = ""
     depth = 0
 
-    for ch in s:
+    for ch in text:
         if ch == "(":
             depth += 1
             buf += ch
@@ -61,6 +108,38 @@ def split_args(s: str) -> list[str]:
         parts.append(buf.strip())
 
     return parts
+
+
+def merge_logical_lines(lines: list[str]) -> list[str]:
+    merged = []
+    buf = ""
+    depth = 0
+
+    for line in lines:
+        text = line.strip()
+        if not text:
+            continue
+
+        if buf:
+            buf += text
+        else:
+            buf = text
+
+        for ch in text:
+            if ch == "(":
+                depth += 1
+            elif ch == ")":
+                depth -= 1
+
+        if depth <= 0:
+            merged.append(buf)
+            buf = ""
+            depth = 0
+
+    if buf:
+        merged.append(buf)
+
+    return merged
 
 
 def split_rows(text: str) -> list[str]:
@@ -87,66 +166,134 @@ def split_rows(text: str) -> list[str]:
     return rows
 
 
+def split_top_level_expressions(text: str) -> list[str]:
+    text = text.strip()
+    parts = []
+    i = 0
+
+    while i < len(text):
+        while i < len(text) and text[i].isspace():
+            i += 1
+
+        start = i
+
+        while i < len(text) and (
+            text[i].isalpha() or text[i] == "_" or text[i] == "\\"
+        ):
+            i += 1
+
+        if i < len(text) and text[i] == "(":
+            end = find_matching_paren(text, i)
+            if end != -1:
+                parts.append(text[start:end + 1].strip())
+                i = end + 1
+                continue
+
+        if start < len(text):
+            parts.append(text[start:].strip())
+        break
+
+    return [p for p in parts if p]
+
+
 def parse_function(expr: str):
     expr = expr.strip()
 
-    if "(" not in expr or not expr.endswith(")"):
+    name_end = 0
+    while name_end < len(expr) and (
+        expr[name_end].isalpha() or expr[name_end] == "_" or expr[name_end] == "\\"
+    ):
+        name_end += 1
+
+    if name_end == 0:
         return None
 
-    idx = expr.find("(")
-    name = expr[:idx].strip()
-    inside = expr[idx + 1:-1].strip()
+    name = expr[:name_end].lstrip("\\")
 
-    if not name:
+    if name_end >= len(expr) or expr[name_end] != "(":
         return None
 
+    close_index = find_matching_paren(expr, name_end)
+
+    if close_index != len(expr) - 1:
+        return None
+
+    inside = expr[name_end + 1:close_index].strip()
     return name, split_args(inside)
+
+
+def normalize_symbol(text: str) -> str:
+    text = text.strip().lstrip("\\")
+    return GREEK_LATEX.get(text, text)
 
 
 def plain_to_latex(expr: str) -> str:
     expr = expr.strip()
+
+    if not expr:
+        return ""
+
+    parts = split_top_level_expressions(expr)
+    if len(parts) > 1:
+        return "".join(plain_to_latex(part) for part in parts)
+
     parsed = parse_function(expr)
 
     if not parsed:
-        return expr
+        return normalize_symbol(expr)
 
     name, args = parsed
-    a = [plain_to_latex(x) for x in args]
 
-    if name == "frac" and len(a) == 2:
-        return rf"\frac{{{a[0]}}}{{{a[1]}}}"
+    if name == "frac" and len(args) == 2:
+        return f"\\frac{{{plain_to_latex(args[0])}}}{{{plain_to_latex(args[1])}}}"
 
-    if name == "sqrt" and len(a) == 1:
-        return rf"\sqrt{{{a[0]}}}"
+    if name == "sqrt" and len(args) == 1:
+        return f"\\sqrt{{{plain_to_latex(args[0])}}}"
 
-    if name in ("pow", "sup") and len(a) == 2:
-        return rf"{a[0]}^{{{a[1]}}}"
+    if name in ("pow", "sup") and len(args) == 2:
+        return f"{plain_to_latex(args[0])}^{{{plain_to_latex(args[1])}}}"
 
-    if name == "sub" and len(a) == 2:
-        return rf"{a[0]}_{{{a[1]}}}"
+    if name == "sub" and len(args) == 2:
+        return f"{plain_to_latex(args[0])}_{{{plain_to_latex(args[1])}}}"
 
-    if name == "sum" and len(a) == 4:
-        return rf"\sum_{{{a[0]}={a[1]}}}^{{{a[2]}}} {a[3]}"
+    if name == "subsup" and len(args) == 3:
+        return f"{plain_to_latex(args[0])}_{{{plain_to_latex(args[1])}}}^{{{plain_to_latex(args[2])}}}"
 
-    if name == "prod" and len(a) == 4:
-        return rf"\prod_{{{a[0]}={a[1]}}}^{{{a[2]}}} {a[3]}"
+    if name == "sum" and len(args) == 4:
+        return f"\\sum_{{{args[0]}={plain_to_latex(args[1])}}}^{{{plain_to_latex(args[2])}}} {plain_to_latex(args[3])}"
 
-    if name == "int" and len(a) == 4:
-        return rf"\int_{{{a[1]}}}^{{{a[2]}}} {a[3]} \, d{a[0]}"
+    if name == "prod" and len(args) == 4:
+        return f"\\prod_{{{args[0]}={plain_to_latex(args[1])}}}^{{{plain_to_latex(args[2])}}} {plain_to_latex(args[3])}"
 
-    if name == "lim" and len(a) == 3:
-        return rf"\lim_{{{a[0]}\to {a[1]}}} {a[2]}"
+    if name == "int" and len(args) == 4:
+        return f"\\int_{{{plain_to_latex(args[1])}}}^{{{plain_to_latex(args[2])}}} {plain_to_latex(args[3])}\\, d{args[0]}"
+
+    if name == "lim" and len(args) == 3:
+        return f"\\lim_{{{args[0]}\\to {plain_to_latex(args[1])}}} {plain_to_latex(args[2])}"
 
     if name == "matrix" and len(args) >= 1:
-        matrix_text = ",".join(args)
-        rows = split_rows(matrix_text)
+        rows = split_rows(",".join(args))
         latex_rows = []
-
         for row in rows:
             cells = split_args(row)
-            latex_rows.append(" & ".join(plain_to_latex(c) for c in cells))
+            latex_rows.append(" & ".join(plain_to_latex(cell) for cell in cells))
+        return "\\begin{matrix}" + r" \\ ".join(latex_rows) + "\\end{matrix}"
 
-        return r"\begin{matrix}" + r" \\ ".join(latex_rows) + r"\end{matrix}"
+    if name == "cases" and len(args) >= 1:
+        rows = split_rows(",".join(args))
+        latex_rows = []
+        for row in rows:
+            cells = split_args(row)
+            latex_rows.append(" & ".join(plain_to_latex(cell) for cell in cells))
+        return "\\begin{cases}" + r" \\ ".join(latex_rows) + "\\end{cases}"
+
+    if name == "align" and len(args) >= 1:
+        rows = split_rows(",".join(args))
+        latex_rows = []
+        for row in rows:
+            cells = split_args(row)
+            latex_rows.append(" & ".join(plain_to_latex(cell) for cell in cells))
+        return "\\begin{aligned}" + r" \\ ".join(latex_rows) + "\\end{aligned}"
 
     return expr
 
@@ -160,57 +307,18 @@ def build_latex_output(lines: list[str], output_mode: str = "inline") -> str:
     return "\n".join(f"${line}$" for line in converted)
 
 
-# ============================================================
-# Validator
-# ============================================================
-
-def validate_plain_math(expr: str) -> list[str]:
+def validate_expression(expr: str) -> list[str]:
     warnings = []
-    expr = expr.strip()
 
-    checks = {
-        "frac": 2,
-        "sqrt": 1,
-        "sum": 4,
-        "prod": 4,
-        "int": 4,
-        "lim": 3,
-    }
-
-    parsed = parse_function(expr)
-
-    if not parsed:
-        return warnings
-
-    name, args = parsed
-
-    if name in checks and len(args) != checks[name]:
-        warnings.append(
-            f"{name} requires {checks[name]} arguments, got {len(args)}."
-        )
-
-    if name == "matrix":
-        matrix_text = ",".join(args)
-        rows = split_rows(matrix_text)
-
-        if len(rows) < 1:
-            warnings.append("matrix requires at least 1 row.")
-
-        row_lengths = [len(split_args(row)) for row in rows]
-
-        if row_lengths and len(set(row_lengths)) > 1:
-            warnings.append(
-                "Matrix row lengths differ. Each row should have the same number of columns."
-            )
+    if expr.count("(") != expr.count(")"):
+        warnings.append("Parentheses are not balanced.")
 
     return warnings
 
 
-# ============================================================
-# Analysis Engine
-# ============================================================
-
 def analyze_lines(lines: list[str]):
+    lines = merge_logical_lines(lines)
+    
     latex_lines = []
     warnings = []
     severity_counts = {}
@@ -221,17 +329,15 @@ def analyze_lines(lines: list[str]):
         if not text:
             continue
 
-        line_warnings = validate_plain_math(text)
-
-        for warning in line_warnings:
-            warning_info = WarningInfo(
+        for message in validate_expression(text):
+            info = WarningInfo(
                 line_number=line_number,
-                message=warning,
+                message=message,
                 text=text,
-                severity="INFO",
+                severity="WARNING",
             )
-            warnings.append(warning_info.to_text())
-            severity_counts["INFO"] = severity_counts.get("INFO", 0) + 1
+            warnings.append(info.to_text())
+            severity_counts["WARNING"] = severity_counts.get("WARNING", 0) + 1
 
         latex_lines.append(plain_to_latex(text))
 
@@ -242,17 +348,26 @@ def build_diagnosis_from_severity_counts(severity_counts: dict) -> Diagnosis:
     total = sum(severity_counts.values())
 
     if total == 0:
-        confidence = 99.0
-        risk = 1.0
-        level = "MINIMAL"
-        warning_text = ""
-    else:
-        confidence = max(70.0, 99.0 - total * 5)
-        risk = min(30.0, total * 5.0)
-        level = "LOW" if total <= 2 else "MEDIUM"
-        warning_text = "\n".join(
-            f"{key}: {value}" for key, value in severity_counts.items()
+        return Diagnosis(
+            confidence_score=99.0,
+            predictive_risk=1.0,
+            risk_level="MINIMAL",
+            warning_text="",
         )
+
+    confidence = max(70.0, 99.0 - total * 5.0)
+    risk = min(30.0, 1.0 + total * 5.0)
+
+    if total <= 1:
+        level = "LOW"
+    elif total <= 3:
+        level = "MEDIUM"
+    else:
+        level = "HIGH"
+
+    warning_text = "\n".join(
+        f"{key}: {value}" for key, value in severity_counts.items()
+    )
 
     return Diagnosis(
         confidence_score=confidence,
@@ -260,11 +375,3 @@ def build_diagnosis_from_severity_counts(severity_counts: dict) -> Diagnosis:
         risk_level=level,
         warning_text=warning_text,
     )
-
-
-# ============================================================
-# HTML Report Support
-# ============================================================
-
-def escape_html(text: str) -> str:
-    return html.escape(str(text), quote=True)

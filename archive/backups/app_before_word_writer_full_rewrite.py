@@ -4,7 +4,6 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox
 from pathlib import Path
-from copy import deepcopy
 
 from docx import Document
 from docx.oxml import parse_xml
@@ -22,83 +21,6 @@ from omml_converter import convert_lines_to_omml
 APP_TITLE = "UTCE MathConvert v2.0 Product Beta Free"
 
 
-# ============================================================
-# Word / OMML Writer
-# ============================================================
-
-def normalize_omml_xml(xml: str) -> str:
-    xml = xml.strip()
-
-    if not xml:
-        return ""
-
-    if "xmlns:m=" not in xml:
-        xml = xml.replace(
-            "<m:oMathPara",
-            f"<m:oMathPara {nsdecls('m', 'w')}",
-            1
-        )
-
-    return xml
-
-
-def insert_omml_paragraph(doc: Document, omml_xml: str) -> bool:
-    try:
-        normalized = normalize_omml_xml(omml_xml)
-        element = parse_xml(normalized)
-
-        paragraph = doc.add_paragraph()
-
-        # oMathPara は段落要素に直接 append すると文字列化される場合があるため、
-        # Word XMLとして paragraph の親要素へ入れる。
-        paragraph._p.append(element)
-        return True
-
-    except Exception as e:
-        paragraph = doc.add_paragraph()
-        paragraph.add_run(f"[OMML INSERT ERROR] {e}")
-        paragraph.add_run("\n")
-        paragraph.add_run(omml_xml)
-        return False
-
-
-def save_word():
-    plain_text = input_box.get("1.0", tk.END).strip()
-
-    if not plain_text:
-        messagebox.showwarning("No Input", "Please enter text before saving Word file.")
-        return
-
-    path = filedialog.asksaveasfilename(
-        title="Save Word File",
-        defaultextension=".docx",
-        filetypes=[("Word Document", "*.docx")]
-    )
-
-    if not path:
-        return
-
-    try:
-        input_lines = plain_text.splitlines()
-        omml_lines = convert_lines_to_omml(input_lines)
-
-        doc = Document()
-
-        for omml_xml in omml_lines:
-            if omml_xml.strip():
-                insert_omml_paragraph(doc, omml_xml)
-
-        doc.save(path)
-        messagebox.showinfo("Saved", "Word document saved successfully.")
-
-    except Exception as e:
-        messagebox.showerror("Save Word Error", str(e))
-
-
-# ============================================================
-# Convert
-# ============================================================
-
 def convert_text():
     plain_text = input_box.get("1.0", tk.END).strip()
 
@@ -111,28 +33,33 @@ def convert_text():
     latex_lines, warnings, severity_counts = analyze_lines(input_lines)
     diagnosis = build_diagnosis_from_severity_counts(severity_counts)
 
-    latex_output = build_latex_output(latex_lines, output_mode_var.get())
+    output_mode = output_mode_var.get()
+    latex_output = build_latex_output(latex_lines, output_mode)
+
     omml_lines = convert_lines_to_omml(input_lines)
+
+    mathml_lines = []
+    for omml in omml_lines:
+        mathml_lines.append("<math><mtext>OMML generated</mtext></math>")
 
     output_box.delete("1.0", tk.END)
     output_box.insert(tk.END, latex_output)
 
     mathml_box.delete("1.0", tk.END)
-    mathml_box.insert(tk.END, "<math><mtext>OMML generated</mtext></math>")
+    mathml_box.insert(tk.END, "\n".join(mathml_lines))
 
     omml_box.delete("1.0", tk.END)
     omml_box.insert(tk.END, "\n".join(omml_lines))
 
-    warning_box.config(text="\n".join(warnings) if warnings else "No warnings.")
+    if warnings:
+        warning_box.config(text="\n".join(warnings))
+    else:
+        warning_box.config(text="No warnings.")
 
     confidence_var.set(f"Confidence: {diagnosis.confidence_score:.1f}")
     risk_var.set(f"Predictive Risk: {diagnosis.predictive_risk:.1f}")
     level_var.set(f"Risk Level: {diagnosis.risk_level}")
 
-
-# ============================================================
-# File / UI Actions
-# ============================================================
 
 def open_text_file():
     path = filedialog.askopenfilename(
@@ -149,11 +76,11 @@ def open_text_file():
 
 
 def example_input():
-    sample = """align(
-frac(sum(i,1,n,pow(a,2)),sqrt(prod(j,1,m,b))),int(x,0,1,frac(alpha,beta));
-cases(frac(a,b),x>0;sqrt(c),x=0;sum(i,1,n,a),x<0),lim(n,inf,frac(1,n));
-matrix(alpha,beta,gamma;delta,epsilon,zeta;eta,theta,lambda),frac(int(t,0,pi,sin(t)),sum(k,1,n,pow(k,2)))
-)"""
+    sample = """frac(alpha,beta)pow(a,2)
+sqrt(frac(a,b))sub(x,i)
+sum(i,1,n,a)prod(j,1,m,b)
+cases(frac(a,b),x;sqrt(c),y)
+align(frac(a,b),sum(i,1,n,c);int(x,0,1,d),sqrt(e))"""
     input_box.delete("1.0", tk.END)
     input_box.insert(tk.END, sample)
 
@@ -173,11 +100,46 @@ def save_output():
     messagebox.showinfo("Saved", "Output saved successfully.")
 
 
+def save_word():
+    omml_text = omml_box.get("1.0", tk.END).strip()
+
+    if not omml_text:
+        messagebox.showwarning("No OMML", "Please convert text before saving Word file.")
+        return
+
+    path = filedialog.asksaveasfilename(
+        title="Save Word File",
+        defaultextension=".docx",
+        filetypes=[("Word Document", "*.docx")]
+    )
+
+    if not path:
+        return
+
+    doc = Document()
+
+    for line in omml_text.splitlines():
+        if not line.strip():
+            continue
+
+        paragraph = doc.add_paragraph()
+        try:
+            omml_xml = parse_xml(line)
+            paragraph._element.append(omml_xml)
+        except Exception:
+            paragraph.add_run(line)
+
+    doc.save(path)
+    messagebox.showinfo("Saved", "Word document saved successfully.")
+
+
 def copy_output():
     text = output_box.get("1.0", tk.END).strip()
+
     root.clipboard_clear()
     root.clipboard_append(text)
     root.update()
+
     messagebox.showinfo("Copied", "Output copied to clipboard.")
 
 
@@ -192,10 +154,6 @@ def clear_all():
     risk_var.set("Predictive Risk:")
     level_var.set("Risk Level:")
 
-
-# ============================================================
-# GUI
-# ============================================================
 
 root = tk.Tk()
 root.title(APP_TITLE)
@@ -219,7 +177,8 @@ file_type_label = tk.Label(
 )
 file_type_label.pack(fill=tk.X, pady=(8, 0))
 
-tk.Label(main_frame, text="Input", anchor="w").pack(fill=tk.X, pady=(12, 0))
+input_label = tk.Label(main_frame, text="Input", anchor="w")
+input_label.pack(fill=tk.X, pady=(12, 0))
 
 input_box = tk.Text(main_frame, height=8, wrap="word")
 input_box.pack(fill=tk.X)
@@ -241,23 +200,32 @@ tk.Label(button_frame, text="Output Mode:").pack(side=tk.LEFT, padx=(30, 4))
 tk.Radiobutton(button_frame, text="Inline", variable=output_mode_var, value="inline").pack(side=tk.LEFT)
 tk.Radiobutton(button_frame, text="Block", variable=output_mode_var, value="block").pack(side=tk.LEFT)
 
-tk.Label(main_frame, text="LaTeX Output", anchor="w").pack(fill=tk.X, pady=(8, 0))
+latex_label = tk.Label(main_frame, text="LaTeX Output", anchor="w")
+latex_label.pack(fill=tk.X, pady=(8, 0))
+
 output_box = tk.Text(main_frame, height=6, wrap="word")
 output_box.pack(fill=tk.X)
 
-tk.Label(main_frame, text="MathML Output", anchor="w").pack(fill=tk.X, pady=(8, 0))
+mathml_label = tk.Label(main_frame, text="MathML Output", anchor="w")
+mathml_label.pack(fill=tk.X, pady=(8, 0))
+
 mathml_box = tk.Text(main_frame, height=5, wrap="word")
 mathml_box.pack(fill=tk.X)
 
-tk.Label(main_frame, text="OMML Output", anchor="w").pack(fill=tk.X, pady=(8, 0))
+omml_label = tk.Label(main_frame, text="OMML Output", anchor="w")
+omml_label.pack(fill=tk.X, pady=(8, 0))
+
 omml_box = tk.Text(main_frame, height=6, wrap="word")
 omml_box.pack(fill=tk.X)
 
-tk.Label(main_frame, text="Warnings", anchor="w").pack(fill=tk.X, pady=(8, 0))
+warning_label = tk.Label(main_frame, text="Warnings", anchor="w")
+warning_label.pack(fill=tk.X, pady=(8, 0))
+
 warning_box = tk.Label(main_frame, text="", anchor="w", justify="left")
 warning_box.pack(fill=tk.X)
 
-tk.Label(main_frame, text="Structural Diagnosis", anchor="w").pack(fill=tk.X, pady=(12, 0))
+diagnosis_label = tk.Label(main_frame, text="Structural Diagnosis", anchor="w")
+diagnosis_label.pack(fill=tk.X, pady=(12, 0))
 
 confidence_var = tk.StringVar(value="Confidence:")
 risk_var = tk.StringVar(value="Predictive Risk:")

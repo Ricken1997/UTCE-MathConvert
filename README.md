@@ -1,208 +1,145 @@
-# UTCE MathConvert Free Beta 1.0
+UTCE MathConvert v2.0 Product Beta Free
 
-UTCE MathConvert is a plain-math to LaTeX / MathML / Word OMML converter.
+UTCE MathConvert is a mathematical expression converter that transforms a unified plain-text syntax into multiple mathematical formats.
 
-## Main Features
+The Product Beta Free edition supports conversion to:
 
-- Greek symbols
-- Fractions
-- Square roots
-- Superscripts
-- Subscripts
-- Summation
-- Product
-- Integral
-- Derivative
-- Limit
-- Matrix
-- Cases
-- Basic operators (+ − × ÷)
-- Native Word equation (.docx) export
+* LaTeX
+* MathML
+* Microsoft Word OMML (Native Equation)
 
-## Recommended Use
+The project is designed for academic writing, technical reports, educational materials, and research documentation.
 
-- Reports
-- Undergraduate theses
-- Graduate reports
-- Office documents
-- Academic drafts
+⸻
 
-## Known Limitations
+Main Features
 
-- Nested expressions are partially supported.
-- Very complex formulas may not render correctly.
-- Operator precedence is still under development.
-- Beta version: please verify output before important use.
+* Plain-text mathematical input
+* Recursive expression parsing
+* Automatic syntax diagnosis
+* Structural warning system
+* Confidence score
+* Predictive risk estimation
+* Native Word OMML generation
+* LaTeX generation
+* MathML generation
 
-## Outputs
+⸻
 
-- LaTeX
-- MathML
-- True OMML
-- Word .docx with native equations
+Supported Mathematical Functions
 
-## Version
+Basic
 
-Free Beta 1.0
+* Addition
+* Subtraction
+* Multiplication
+* Division
 
-Future:
+Structures
 
-- v1.1 Recursive nesting
-- v2.0 Full parser engine
+* Fractions
+* Square roots
+* Powers
+* Subscripts
+* Superscripts
+* Combined sub/sup
 
+Symbols
 
+* Greek symbols
 
-# UTCE-MathConvert
+Large Operators
 
-Plain Math → Word OMML Converter
+* Summation
+* Product
+* Integral
+* Limits
 
----
+Advanced Structures
 
-## Application Icon
+* Matrix
+* Cases
+* Align
 
-![Application Icon](images/main.png)
+⸻
 
----
+Example Input
 
-## Main Window
-
-![Main Window](images/main_window.png)
-
----
-
-## Word Output
-
-![Word Output](images/word_output.png)
-
----
-
-## Complex Formula Example
-
-![Complex Formula](images/complex_formula.png)
-
----
-
-## Features
-
-- Greek symbols
-- Fractions
-- Square roots
-- Superscripts
-- Subscripts
-- Summation
-- Product
-- Integral
-- Limits
-- Matrix
-- Cases
-- Derivatives
-- + − × ÷ operators
-- Native Word OMML output
-
----
-
-## Outputs
-
-- LaTeX
-- MathML
-- Word OMML
-- .docx with native equations
-
----
-
-## Platform
-
-macOS (Apple Silicon)
-
----
-
-## Author
-
-Yuichi Fujiki
-
----
-
-## License
-
-MIT License
-
-
-# UTCE MathConvert
-
-UTCE MathConvert is a lightweight mathematical expression converter for transforming plain math-like syntax into LaTeX, MathML, and Word OMML.
-
-## Current Version
-
-v2.0 RC
-
-## Core Features
-
-- Plain text math input
-- LaTeX output
-- MathML output
-- Word OMML output
-- Recursive nested expression support
-- Matrix support
-- Structural diagnostic summary
-- Confidence / predictive risk display
-
-## Supported Functions
-
-```text
-frac(a,b)
-sqrt(a)
-pow(a,b)
+frac(alpha,beta)pow(a,2)
+sqrt(frac(a,b))sub(x,i)
 sum(i,1,n,a)
-prod(i,1,n,a)
-int(x,0,1,a)
-lim(t,0,a)
-matrix(a,b;c,d)
+prod(j,1,m,b)
+cases(frac(a,b),x;sqrt(c),y)
+align(frac(a,b),sum(i,1,n,c);int(x,0,1,d),sqrt(e))
 
-app.py
-omml_converter.py
-utce_core.py
-utce_core_refactor_work.py
-docs/
-tests/
-output/
-archive/backups/
+⸻
 
-Release Notes はこれ。
+Output Formats
 
-```md
-# Release Notes v2.0 RC
+UTCE MathConvert generates:
 
-Date: 2026-06-28
+* LaTeX
+* MathML
+* Microsoft Word OMML
+* Native Word Equation (.docx)
 
-## Summary
+⸻
 
-This release stabilizes the UTCE MathConvert v2.0 RC core.
+Recommended Use
 
-## Major Changes
+* Academic papers
+* Undergraduate theses
+* Graduate theses
+* Technical reports
+* Office documents
+* Research notes
+* Educational materials
 
-- Reorganized project folder structure.
-- Archived legacy backup files.
-- Added recursive conversion support.
-- Stabilized LaTeX, MathML, and OMML generation.
-- Improved diagnostic output.
-- Removed obsolete Beta 1.0 warning logic.
+⸻
 
-## Confirmed Working
+Product Status
 
-- frac
-- sqrt
-- pow
-- sum
-- prod
-- int
-- lim
-- matrix
-- nested composite expressions
+Current Version
 
-## Known Remaining Work
+UTCE MathConvert v2.0 Product Beta Free
 
-- cases support
-- align support
-- advanced Word OMML layout refinement
-- Greek symbol expansion
-- UI polish
+This release focuses on stable parser architecture, Word equation generation, and production-level usability.
+
+⸻
+
+Roadmap
+
+Current
+
+* Stable parser
+* Native Word OMML
+* Greek symbols
+* Cases
+* Align
+* Structural diagnostics
+
+Planned
+
+* Full LaTeX parser
+* Equation numbering
+* User-defined macros
+* Plugin architecture
+* Commercial Edition
+
+⸻
+
+Known Limitations
+
+* Some advanced LaTeX-native syntax is not yet supported.
+* Deeply nested expressions may require additional parser refinement.
+* Word OMML layout may continue to improve in future releases.
+
+⸻
+
+License
+
+Product Beta Free Edition
+
+Copyright © 2026 Yuichi Fujiki
+
+All rights reserved.
