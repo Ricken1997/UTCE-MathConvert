@@ -2,121 +2,72 @@
 # -*- coding: utf-8 -*-
 
 """
-UTCE MathConvert
-v2.0 Product Beta Core
-
-Role:
-- Parse plain math syntax.
-- Build recursive OMML.
-- Support concatenated expressions.
-- Support core free-edition functions.
+UTCE MathConvert OMML Converter
+v2.0 Full Core Candidate
 
 Supported:
-frac, sqrt, pow, sup, sub, subsup,
-sum, prod, int, lim,
-matrix, cases, align,
-Greek symbols.
+- frac
+- sqrt
+- pow / sup
+- sub
+- subsup
+- sum
+- prod
+- int
+- lim
+- matrix
+- cases
+- align
+- Greek symbols
 """
 
 import html
 
 
-# ============================================================
-# Symbols
-# ============================================================
-
 GREEK_MAP = {
-    "alpha": "α", "beta": "β", "gamma": "γ", "delta": "δ",
-    "epsilon": "ε", "zeta": "ζ", "eta": "η", "theta": "θ",
-    "iota": "ι", "kappa": "κ", "lambda": "λ", "mu": "μ",
-    "nu": "ν", "xi": "ξ", "pi": "π", "rho": "ρ",
-    "sigma": "σ", "tau": "τ", "upsilon": "υ", "phi": "φ",
-    "chi": "χ", "psi": "ψ", "omega": "ω",
-    "Delta": "Δ", "Theta": "Θ", "Lambda": "Λ", "Xi": "Ξ",
-    "Pi": "Π", "Sigma": "Σ", "Phi": "Φ", "Psi": "Ψ", "Omega": "Ω",
+    "alpha": "α",
+    "beta": "β",
+    "gamma": "γ",
+    "delta": "δ",
+    "epsilon": "ε",
+    "theta": "θ",
+    "lambda": "λ",
+    "mu": "μ",
+    "pi": "π",
+    "sigma": "σ",
+    "omega": "ω",
+    "Delta": "Δ",
+    "Theta": "Θ",
+    "Lambda": "Λ",
+    "Pi": "Π",
+    "Sigma": "Σ",
+    "Omega": "Ω",
 }
 
-
-OPERATOR_MAP = {
-    "+": "+",
-    "-": "−",
-    "*": "×",
-    "/": "÷",
-    "=": "=",
-    "->": "→",
-}
-
-
-# ============================================================
-# XML / OMML Utilities
-# ============================================================
 
 def escape_xml(text: str) -> str:
     return html.escape(str(text), quote=False)
 
 
-def normalize_symbol(text: str) -> str:
-    text = text.strip()
-
-    if text.startswith("\\"):
-        text = text[1:]
-
-    return GREEK_MAP.get(text, text)
-
-
 def omml_text(text: str) -> str:
+    text = GREEK_MAP.get(text, text)
     return (
         "<m:r>"
         "<m:t>"
-        + escape_xml(normalize_symbol(text)) +
-        "</m:t>"
+        + escape_xml(text)
+        + "</m:t>"
         "</m:r>"
     )
 
 
-def omml_space() -> str:
-    return omml_text(" ")
-
-
-def omml_para(inner: str) -> str:
+def omml_para(body: str) -> str:
     return (
         "<m:oMathPara>"
         "<m:oMath>"
-        + inner +
+        + body +
         "</m:oMath>"
         "</m:oMathPara>"
     )
-
-
-def wrap_omml(inner: str) -> str:
-    return omml_para(inner)
-
-
-def strip_omml_wrapper(xml: str) -> str:
-    xml = xml.strip()
-    xml = xml.replace("<m:oMathPara>", "")
-    xml = xml.replace("</m:oMathPara>", "")
-    xml = xml.replace("<m:oMath>", "")
-    xml = xml.replace("</m:oMath>", "")
-    return xml.strip()
-
-
-# ============================================================
-# Parser Utilities
-# ============================================================
-
-def find_matching_paren(text: str, open_index: int) -> int:
-    depth = 0
-
-    for i in range(open_index, len(text)):
-        if text[i] == "(":
-            depth += 1
-        elif text[i] == ")":
-            depth -= 1
-            if depth == 0:
-                return i
-
-    return -1
 
 
 def split_args(text: str) -> list[str]:
@@ -167,13 +118,53 @@ def split_rows(text: str) -> list[str]:
     return rows
 
 
+def find_matching_paren(text: str, open_index: int) -> int:
+    depth = 0
+
+    for i in range(open_index, len(text)):
+        if text[i] == "(":
+            depth += 1
+        elif text[i] == ")":
+            depth -= 1
+            if depth == 0:
+                return i
+
+    return -1
+
+
+def split_top_level_expressions(text: str) -> list[str]:
+    text = text.strip()
+    parts = []
+    i = 0
+
+    while i < len(text):
+        while i < len(text) and text[i].isspace():
+            i += 1
+
+        start = i
+
+        while i < len(text) and (text[i].isalpha() or text[i] == "_"):
+            i += 1
+
+        if i < len(text) and text[i] == "(":
+            end = find_matching_paren(text, i)
+            if end != -1:
+                parts.append(text[start:end + 1].strip())
+                i = end + 1
+                continue
+
+        if start < len(text):
+            parts.append(text[start:].strip())
+        break
+
+    return [p for p in parts if p]
+
+
 def parse_function(expr: str):
     expr = expr.strip()
 
     name_end = 0
-    while name_end < len(expr) and (
-        expr[name_end].isalpha() or expr[name_end] == "_"
-    ):
+    while name_end < len(expr) and (expr[name_end].isalpha() or expr[name_end] == "_"):
         name_end += 1
 
     if name_end == 0:
@@ -193,74 +184,6 @@ def parse_function(expr: str):
     return name, split_args(inside)
 
 
-def split_top_level_expressions(text: str) -> list[str]:
-    text = text.strip()
-    parts = []
-    i = 0
-
-    while i < len(text):
-        while i < len(text) and text[i].isspace():
-            i += 1
-
-        start = i
-
-        while i < len(text) and (
-            text[i].isalpha() or text[i] == "_" or text[i] == "\\"
-        ):
-            i += 1
-
-        if i < len(text) and text[i] == "(":
-            end = find_matching_paren(text, i)
-            if end != -1:
-                parts.append(text[start:end + 1].strip())
-                i = end + 1
-                continue
-
-        if start < len(text):
-            parts.append(text[start:].strip())
-        break
-
-    return [p for p in parts if p]
-
-
-def split_top_level_by_operator(text: str) -> list[str] | None:
-    depth = 0
-    parts = []
-    buf = ""
-
-    i = 0
-    while i < len(text):
-        ch = text[i]
-
-        if ch == "(":
-            depth += 1
-            buf += ch
-        elif ch == ")":
-            depth -= 1
-            buf += ch
-        elif depth == 0 and ch in ["+", "-", "*", "="]:
-            if buf.strip():
-                parts.append(buf.strip())
-            parts.append(ch)
-            buf = ""
-        else:
-            buf += ch
-
-        i += 1
-
-    if buf.strip():
-        parts.append(buf.strip())
-
-    if len(parts) >= 3:
-        return parts
-
-    return None
-
-
-# ============================================================
-# Basic OMML Builders
-# ============================================================
-
 def omml_fraction(num: str, den: str) -> str:
     return (
         "<m:f>"
@@ -274,7 +197,7 @@ def omml_sqrt(body: str) -> str:
     return (
         "<m:rad>"
         "<m:radPr><m:degHide m:val=\"1\"/></m:radPr>"
-        "<m:deg/>"
+        "<m:deg></m:deg>"
         "<m:e>" + body + "</m:e>"
         "</m:rad>"
     )
@@ -308,12 +231,8 @@ def omml_subsup(base: str, sub: str, sup: str) -> str:
     )
 
 
-# ============================================================
-# N-ary OMML Builders
-# ============================================================
-
 def omml_nary(symbol: str, index: str, lower: str, upper: str, body: str) -> str:
-    sub = omml_text(index) + omml_text("=") + lower
+    sub = omml_text(index + "=") + lower
 
     return (
         "<m:nary>"
@@ -345,35 +264,22 @@ def omml_integral(variable: str, lower: str, upper: str, body: str) -> str:
         "</m:naryPr>"
         "<m:sub>" + lower + "</m:sub>"
         "<m:sup>" + upper + "</m:sup>"
-        "<m:e>"
-        + body
-        + omml_text(" d")
-        + omml_text(variable)
-        + "</m:e>"
+        "<m:e>" + body + omml_text(" d") + omml_text(variable) + "</m:e>"
         "</m:nary>"
     )
 
 
 def omml_limit(variable: str, target: str, body: str) -> str:
-    return (
-        omml_sub(
-            omml_text("lim"),
-            omml_text(variable) + omml_text("→") + target
-        )
-        + body
-    )
+    lim_text = omml_text("lim")
+    sub_text = omml_text(variable + "→") + target
+    return omml_sub(lim_text, sub_text) + body
 
-
-# ============================================================
-# Table / Layout Builders
-# ============================================================
 
 def omml_matrix_cells(rows: list[list[str]]) -> str:
     row_xml = ""
 
     for row in rows:
         cell_xml = ""
-
         for cell in row:
             cell_xml += "<m:e>" + cell + "</m:e>"
 
@@ -397,16 +303,15 @@ def parse_matrix_cells(matrix_text: str) -> list[list[str]]:
 def omml_matrix(matrix_text: str) -> str:
     rows = parse_matrix_cells(matrix_text)
 
-    omml_rows = [
-        [to_inner_omml(cell) for cell in row]
-        for row in rows
-    ]
+    omml_rows = []
+    for row in rows:
+        omml_rows.append([to_inner_omml(cell) for cell in row])
 
     return omml_matrix_cells(omml_rows)
 
 
 def omml_cases(matrix_text: str) -> str:
-    matrix = omml_matrix(matrix_text)
+    matrix_body = omml_matrix(matrix_text)
 
     return (
         "<m:d>"
@@ -414,7 +319,7 @@ def omml_cases(matrix_text: str) -> str:
         "<m:begChr m:val=\"{\"/>"
         "<m:endChr m:val=\"\"/>"
         "</m:dPr>"
-        "<m:e>" + matrix + "</m:e>"
+        "<m:e>" + matrix_body + "</m:e>"
         "</m:d>"
     )
 
@@ -423,17 +328,11 @@ def omml_align(matrix_text: str) -> str:
     return omml_matrix(matrix_text)
 
 
-# ============================================================
-# Dispatcher
-# ============================================================
-
 def args_to_omml(args: list[str]) -> list[str]:
     return [to_inner_omml(arg) for arg in args]
 
 
 def convert_function_to_omml(name: str, args: list[str]) -> str | None:
-    name = name.strip().lstrip("\\")
-
     if name == "frac" and len(args) == 2:
         a = args_to_omml(args)
         return omml_fraction(a[0], a[1])
@@ -482,52 +381,31 @@ def convert_function_to_omml(name: str, args: list[str]) -> str | None:
     return None
 
 
-# ============================================================
-# Recursive Converter
-# ============================================================
-
 def to_inner_omml(expr: str) -> str:
     expr = expr.strip()
 
-    if not expr:
-        return ""
+    multi_parts = split_top_level_expressions(expr)
 
-    op_parts = split_top_level_by_operator(expr)
-    if op_parts:
-        out = ""
-        for part in op_parts:
-            if part in OPERATOR_MAP:
-                out += omml_text(OPERATOR_MAP[part])
-            else:
-                out += to_inner_omml(part)
-        return out
-
-    parts = split_top_level_expressions(expr)
-    if len(parts) > 1:
-        return "".join(to_inner_omml(part) for part in parts)
+    if len(multi_parts) > 1:
+        return "".join(to_inner_omml(part) for part in multi_parts)
 
     parsed = parse_function(expr)
-    if parsed:
-        name, args = parsed
-        converted = convert_function_to_omml(name, args)
 
-        if converted is not None:
-            return converted
+    if not parsed:
+        return omml_text(expr)
+
+    name, args = parsed
+    converted = convert_function_to_omml(name, args)
+
+    if converted is not None:
+        return converted
 
     return omml_text(expr)
 
-
-# ============================================================
-# Public API
-# ============================================================
 
 def plain_to_omml(expr: str) -> str:
     return omml_para(to_inner_omml(expr))
 
 
 def convert_lines_to_omml(lines: list[str]) -> list[str]:
-    return [
-        plain_to_omml(line)
-        for line in lines
-        if line.strip()
-    ]
+    return [plain_to_omml(line) for line in lines if line.strip()]
