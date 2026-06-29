@@ -21,7 +21,7 @@ from utce_core_refactor_work import (
 from omml_converter import convert_lines_to_omml
 
 
-APP_TITLE = "UTCE MathConvert v2.0 Product Release"
+APP_TITLE = "UTCE MathConvert v2.0 Product Release Free"
 WINDOW_SIZE = "1450x1000"
 EXPAND_SIZE = "1300x850"
 PREVIEW_SIZE = "1200x800"

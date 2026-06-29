@@ -1,145 +1,232 @@
-UTCE MathConvert v2.0 Product Beta Free
+UTCE MathConvert v2.0 Product Release Free
 
-UTCE MathConvert is a mathematical expression converter that transforms a unified plain-text syntax into multiple mathematical formats.
+A lightweight, reliable, and extensible mathematical expression conversion environment for researchers, educators, engineers, and students.
 
-The Product Beta Free edition supports conversion to:
+⸻
+
+Overview
+
+UTCE MathConvert is a desktop application designed to convert mathematical expressions into multiple standard formats through a unified workflow.
+
+The application currently supports:
 
 * LaTeX
 * MathML
-* Microsoft Word OMML (Native Equation)
+* Office MathML (OMML)
 
-The project is designed for academic writing, technical reports, educational materials, and research documentation.
+and provides direct Microsoft Word export using native Office Math equations.
 
-⸻
+Unlike simple converters, UTCE MathConvert also performs structural diagnostics to help users evaluate conversion quality before exporting.
 
-Main Features
-
-* Plain-text mathematical input
-* Recursive expression parsing
-* Automatic syntax diagnosis
-* Structural warning system
-* Confidence score
-* Predictive risk estimation
-* Native Word OMML generation
-* LaTeX generation
-* MathML generation
+This software is released as the official Product Release Free Edition.
 
 ⸻
 
-Supported Mathematical Functions
+Features
 
-Basic
+Mathematical Conversion
 
-* Addition
-* Subtraction
-* Multiplication
-* Division
-
-Structures
+Supported expressions include:
 
 * Fractions
 * Square roots
 * Powers
 * Subscripts
 * Superscripts
-* Combined sub/sup
-
-Symbols
-
-* Greek symbols
-
-Large Operators
-
-* Summation
-* Product
-* Integral
+* Combined Sub/Sup
+* Summations
+* Products
+* Integrals
 * Limits
-
-Advanced Structures
-
-* Matrix
+* Matrices
 * Cases
-* Align
-
-⸻
-
-Example Input
-
-frac(alpha,beta)pow(a,2)
-sqrt(frac(a,b))sub(x,i)
-sum(i,1,n,a)
-prod(j,1,m,b)
-cases(frac(a,b),x;sqrt(c),y)
-align(frac(a,b),sum(i,1,n,c);int(x,0,1,d),sqrt(e))
+* Align environments
+* Greek symbols
+* Nested expressions
 
 ⸻
 
 Output Formats
 
-UTCE MathConvert generates:
+Generate:
 
 * LaTeX
 * MathML
-* Microsoft Word OMML
-* Native Word Equation (.docx)
+* Office MathML (OMML)
+
+Export directly to:
+
+* Microsoft Word (.docx)
 
 ⸻
 
-Recommended Use
+User Interface
 
-* Academic papers
-* Undergraduate theses
-* Graduate theses
-* Technical reports
-* Office documents
-* Research notes
-* Educational materials
+The application includes:
 
-⸻
-
-Product Status
-
-Current Version
-
-UTCE MathConvert v2.0 Product Beta Free
-
-This release focuses on stable parser architecture, Word equation generation, and production-level usability.
+* Unified editor layout
+* Expandable editors
+* Horizontal scrolling
+* Vertical scrolling
+* Large editor mode
+* Text file loading
+* Copy output
+* Save output
+* Word export
 
 ⸻
 
-Roadmap
+Preview Workflow
 
-Current
+All output operations follow a preview-first workflow.
 
-* Stable parser
-* Native Word OMML
-* Greek symbols
-* Cases
-* Align
-* Structural diagnostics
+Word Export
 
-Planned
+Convert
+    ↓
+Preview Word
+    ↓
+Save As
+    ↓
+Open Word / Open Folder
 
-* Full LaTeX parser
-* Equation numbering
-* User-defined macros
-* Plugin architecture
-* Commercial Edition
+This minimizes accidental exports and allows immediate verification before distribution.
+
+⸻
+
+Structural Diagnostics
+
+UTCE MathConvert analyzes expressions during conversion and provides:
+
+* Confidence Score
+* Predictive Risk
+* Risk Level
+* Warning Count
+* Expression Count
+* Parser Time
+
+These diagnostics help users identify potential issues before exporting.
+
+⸻
+
+Typical Workflow
+
+1. Enter or load mathematical expressions.
+2. Press Convert.
+3. Review generated LaTeX, MathML, and OMML.
+4. Review diagnostics.
+5. Preview the Word document.
+6. Save if satisfied.
+
+⸻
+
+System Requirements
+
+* macOS
+* Python 3.11+
+* tkinter
+* python-docx
+
+⸻
+
+Installation
+
+Clone the repository:
+
+git clone https://github.com/your-repository/UTCE-MathConvert.git
+
+Install dependencies:
+
+pip install python-docx
+
+Run:
+
+python3 app.py
 
 ⸻
 
 Known Limitations
 
-* Some advanced LaTeX-native syntax is not yet supported.
-* Deeply nested expressions may require additional parser refinement.
-* Word OMML layout may continue to improve in future releases.
+Current release limitations include:
+
+* Extremely large single-line expressions may require manual splitting.
+* Very deep recursive expressions can increase conversion time.
+* Full native LaTeX parsing is planned for a future version.
+
+These limitations are known and are scheduled for improvement.
+
+⸻
+
+Roadmap
+
+Version 2.1
+
+* Expression Splitter
+* Automatic chunk processing
+* Improved parser stability
+* Large expression optimization
+
+⸻
+
+Version 2.5
+
+* AI-assisted syntax repair
+* Intelligent parser suggestions
+* Automatic structural correction
+
+⸻
+
+Version 3.0
+
+AI Edition
+
+Planned features:
+
+* Natural language to mathematical expressions
+* AI-assisted mathematical translation
+* Semantic equation analysis
+* AI correction engine
+
+⸻
+
+Design Philosophy
+
+UTCE MathConvert follows four principles.
+
+1. Reliability before complexity.
+2. Preview before export.
+3. Human verification before publication.
+4. Extensible architecture for future AI integration.
 
 ⸻
 
 License
 
-Product Beta Free Edition
+Product Release Free Edition.
 
-Copyright © 2026 Yuichi Fujiki
+Copyright © Yuichi Fujiki.
 
 All rights reserved.
+
+⸻
+
+Author
+
+Yuichi Fujiki
+
+⸻
+
+Acknowledgements
+
+Thank you to everyone who participated in testing, stress testing, reviewing, and improving UTCE MathConvert.
+
+Your feedback has helped shape the Product Release Free Edition into a stable and practical mathematical conversion environment.
+
+⸻
+
+UTCE MathConvert v2.0 Product Release Free
+
+Reliable Mathematical Conversion.
+Ready for Research.
+Ready for Education.
+Ready for the Future.
