@@ -219,65 +219,6 @@ def output_selection_dialog(action: str):
     tk.Button(frame, text="Cancel", command=window.destroy).pack(side=tk.LEFT, padx=4, pady=18)
 
 
-def open_file(path: str):
-    try:
-        subprocess.Popen(["open", path])
-    except Exception as e:
-        messagebox.showerror("Open Error", str(e))
-
-
-def open_folder(path: str):
-    try:
-        folder = str(Path(path).parent)
-        subprocess.Popen(["open", folder])
-    except Exception as e:
-        messagebox.showerror("Open Folder Error", str(e))
-
-
-def saved_word_dialog(path: str):
-    window = tk.Toplevel(root)
-    window.title("Word Saved")
-    window.geometry("520x260")
-
-    frame = tk.Frame(window, padx=14, pady=14)
-    frame.pack(fill=tk.BOTH, expand=True)
-
-    tk.Label(
-        frame,
-        text="Word document saved successfully.",
-        font=("Helvetica", 15, "bold"),
-        anchor="w"
-    ).pack(fill=tk.X)
-
-    tk.Label(
-        frame,
-        text=f"Saved to:\n{path}",
-        justify="left",
-        anchor="w"
-    ).pack(fill=tk.X, pady=12)
-
-    button_frame = tk.Frame(frame)
-    button_frame.pack(fill=tk.X, pady=10)
-
-    tk.Button(
-        button_frame,
-        text="Open Word",
-        command=lambda: open_file(path)
-    ).pack(side=tk.LEFT, padx=4)
-
-    tk.Button(
-        button_frame,
-        text="Open Folder",
-        command=lambda: open_folder(path)
-    ).pack(side=tk.LEFT, padx=4)
-
-    tk.Button(
-        button_frame,
-        text="Close",
-        command=window.destroy
-    ).pack(side=tk.LEFT, padx=4)
-
-
 def save_word_preview_dialog():
     plain_text = input_box.get("1.0", tk.END).strip()
 
@@ -327,7 +268,10 @@ def save_word_preview_dialog():
         try:
             doc = build_word_document_from_input()
             doc.save(path)
-            saved_word_dialog(path)
+            messagebox.showinfo(
+                "Saved",
+                f"Word document saved successfully.\n\nSaved to:\n{path}"
+            )
             window.destroy()
         except Exception as e:
             messagebox.showerror("Save Word Error", str(e))
