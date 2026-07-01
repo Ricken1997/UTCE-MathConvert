@@ -1,159 +1,127 @@
-UTCE MathConvert v2.0 Product Release Free
+# UTCE MathConvert
 
-A lightweight, reliable, and extensible mathematical expression conversion environment for researchers, educators, engineers, and students.
+**Professional Mathematical Expression Conversion for macOS**
+
+UTCE MathConvert is a macOS application for converting mathematical expressions into formats suitable for academic writing, technical documentation, and Microsoft Word workflows.
+
+It supports conversion workflows involving:
+
+- Plain Math
+- LaTeX-style expressions
+- MathML
+- Office Math / OMML
+- Microsoft Word `.docx` export
+
+---
+
+## Overview
+
+Mathematical documents often move between different systems: LaTeX, MathML, Microsoft Word, and Office Math.
+
+These formats are not always compatible with one another.
+
+UTCE MathConvert provides a lightweight desktop workflow for converting mathematical expressions and exporting them into editable Microsoft Word equations.
+
+The application is designed for:
+
+* Researchers
+* Educators
+* Students
+* Engineers
+* Technical writers
+* Academic document authors
 
 ⸻
 
-Overview
+Key Features
 
-UTCE MathConvert is a desktop application designed to convert mathematical expressions into multiple standard formats through a unified workflow.
+* Plain Math conversion
+* LaTeX-style input support
+* MathML generation
+* Office Math / OMML generation
+* Microsoft Word .docx export
+* Editable Word equations
+* Output preview
+* Word preview
+* Expandable input and output areas
+* Horizontal and vertical scrolling
+* Structural diagnostics
+* Confidence estimation
+* Predictive risk analysis
+* Local processing
+* No account required
+* No data collection
 
-The application currently supports:
+⸻
 
-* LaTeX
+Why UTCE MathConvert?
+
+Many mathematical tools are either too complex, web-based, or poorly integrated with Microsoft Word.
+
+UTCE MathConvert focuses on a practical workflow:
+
+Input Expression
+      ↓
+Conversion Engine
+      ↓
+MathML / OMML
+      ↓
+Microsoft Word Equation
+
+The goal is not only to convert symbols, but to produce usable mathematical output for real documents.
+
+⸻
+
+Screenshots
+
+Add screenshots to the images/ folder and reference them here.
+
+![Main Window](images/main-window.png)
+![Word Export](images/word-export.png)
+![Output Preview](images/output-preview.png)
+
+⸻
+
+Supported Output
+
+UTCE MathConvert can generate:
+
+* Unicode mathematical symbols
 * MathML
-* Office MathML (OMML)
+* Office Math Markup Language / OMML
+* Microsoft Word .docx files
 
-and provides direct Microsoft Word export using native Office Math equations.
-
-Unlike simple converters, UTCE MathConvert also performs structural diagnostics to help users evaluate conversion quality before exporting.
-
-This software is released as the official Product Release Free Edition.
+Generated Word equations remain editable inside Microsoft Word.
 
 ⸻
 
-Features
+Privacy
 
-Mathematical Conversion
+UTCE MathConvert processes mathematical expressions locally on your Mac.
 
-Supported expressions include:
+The app does not collect, store, transmit, or share personal data.
 
-* Fractions
-* Square roots
-* Powers
-* Subscripts
-* Superscripts
-* Combined Sub/Sup
-* Summations
-* Products
-* Integrals
-* Limits
-* Matrices
-* Cases
-* Align environments
-* Greek symbols
-* Nested expressions
+* No analytics
+* No tracking
+* No advertising SDK
+* No cloud processing
+* No user account
+
+Privacy Policy:
+
+https://ricken1997.github.io/UTCE-MathConvert/privacy.html
 
 ⸻
 
-Output Formats
+Download
 
-Generate:
+GitHub Release
 
-* LaTeX
-* MathML
-* Office MathML (OMML)
+The latest public release is available from the GitHub Releases page.
 
-Export directly to:
+Mac App Store
 
-* Microsoft Word (.docx)
-
-⸻
-
-User Interface
-
-The application includes:
-
-* Unified editor layout
-* Expandable editors
-* Horizontal scrolling
-* Vertical scrolling
-* Large editor mode
-* Text file loading
-* Copy output
-* Save output
-* Word export
-
-⸻
-
-Preview Workflow
-
-All output operations follow a preview-first workflow.
-
-Word Export
-
-Convert
-    ↓
-Preview Word
-    ↓
-Save As
-    ↓
-Open Word / Open Folder
-
-This minimizes accidental exports and allows immediate verification before distribution.
-
-⸻
-
-Structural Diagnostics
-
-UTCE MathConvert analyzes expressions during conversion and provides:
-
-* Confidence Score
-* Predictive Risk
-* Risk Level
-* Warning Count
-* Expression Count
-* Parser Time
-
-These diagnostics help users identify potential issues before exporting.
-
-⸻
-
-Typical Workflow
-
-1. Enter or load mathematical expressions.
-2. Press Convert.
-3. Review generated LaTeX, MathML, and OMML.
-4. Review diagnostics.
-5. Preview the Word document.
-6. Save if satisfied.
-
-⸻
-
-System Requirements
-
-* macOS
-* Python 3.11+
-* tkinter
-* python-docx
-
-⸻
-
-Installation
-
-Clone the repository:
-
-git clone https://github.com/your-repository/UTCE-MathConvert.git
-
-Install dependencies:
-
-pip install python-docx
-
-Run:
-
-python3 app.py
-
-⸻
-
-Known Limitations
-
-Current release limitations include:
-
-* Extremely large single-line expressions may require manual splitting.
-* Very deep recursive expressions can increase conversion time.
-* Full native LaTeX parsing is planned for a future version.
-
-These limitations are known and are scheduled for improvement.
+UTCE MathConvert has been submitted for Mac App Store review.
 
 ⸻
 
@@ -161,52 +129,61 @@ Roadmap
 
 Version 2.1
 
-* Expression Splitter
-* Automatic chunk processing
-* Improved parser stability
-* Large expression optimization
+* Improved expression parsing
+* Better Word compatibility
+* Enhanced error handling
+* More reliable preview workflow
 
-⸻
+Version 2.2
 
-Version 2.5
-
-* AI-assisted syntax repair
-* Intelligent parser suggestions
-* Automatic structural correction
-
-⸻
+* Additional mathematical structures
+* Improved diagnostics
+* Expanded symbol support
 
 Version 3.0
 
-AI Edition
-
-Planned features:
-
-* Natural language to mathematical expressions
-* AI-assisted mathematical translation
-* Semantic equation analysis
-* AI correction engine
+* Batch conversion
+* Advanced structural analysis
+* AI-assisted mathematical editing
+* Pro workflow features
 
 ⸻
 
-Design Philosophy
+FAQ
 
-UTCE MathConvert follows four principles.
+Does UTCE MathConvert require an internet connection?
 
-1. Reliability before complexity.
-2. Preview before export.
-3. Human verification before publication.
-4. Extensible architecture for future AI integration.
+No. Conversion is performed locally.
+
+Does the app collect user data?
+
+No.
+
+Can exported equations be edited in Word?
+
+Yes. The generated Office Math equations are editable inside Microsoft Word.
+
+Is this a LaTeX editor?
+
+No. UTCE MathConvert is a mathematical conversion and Word export tool.
+
+Is the Mac App Store version available?
+
+The app has been submitted for review.
 
 ⸻
 
-License
+Technical Notes
 
-Product Release Free Edition.
+UTCE MathConvert uses a local conversion workflow to generate mathematical output suitable for Word-based academic and technical documents.
 
-Copyright © Yuichi Fujiki.
+The project combines:
 
-All rights reserved.
+* macOS desktop interface
+* mathematical expression parsing
+* MathML generation
+* OMML generation
+* Word document export
 
 ⸻
 
@@ -214,19 +191,24 @@ Author
 
 Yuichi Fujiki
 
-⸻
-
-Acknowledgements
-
-Thank you to everyone who participated in testing, stress testing, reviewing, and improving UTCE MathConvert.
-
-Your feedback has helped shape the Product Release Free Edition into a stable and practical mathematical conversion environment.
+GitHub: Ricken1997
 
 ⸻
+
+License
+
+Copyright © 2026 Yuichi Fujiki.
+
+All rights reserved.
+
+⸻
+
+Status
+
+Current release:
 
 UTCE MathConvert v2.0 Product Release Free
 
-Reliable Mathematical Conversion.
-Ready for Research.
-Ready for Education.
-Ready for the Future.
+Mac App Store:
+
+Submitted for review
